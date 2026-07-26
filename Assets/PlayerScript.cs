@@ -11,13 +11,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce = 3f;
 
     [Header("Ground Check")]
-    [SerializeField] private Transform groundCheck; 
+    [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.2f;
-    [SerializeField] private LayerMask groundLayer;  
+    [SerializeField] private LayerMask groundLayer;
 
     [SerializeField] private bool isGrounded;
     private float moveInput;
     private bool jumpRequested;
+
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     private void Awake()
     {
@@ -31,6 +35,7 @@ public class PlayerController : MonoBehaviour
     {
         ReadMovementInput();
         ReadJumpInput();
+        UpdateAnimations();
     }
 
     private void FixedUpdate()
@@ -67,6 +72,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void UpdateAnimations()
+    {
+        bool isWalking = moveInput != 0f;
+
+        if (animator != null)
+        {
+            animator.SetBool("IsWalking", isWalking);
+        }
+
+        if (isWalking && spriteRenderer != null)
+        {
+            spriteRenderer.flipX = moveInput < 0f;
+        }
+    }
+
     private void CheckGrounded()
     {
         if (groundCheck == null) return;
@@ -85,7 +105,6 @@ public class PlayerController : MonoBehaviour
         rigidBody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 
-    // For debug
     private void OnDrawGizmosSelected()
     {
         if (groundCheck != null)

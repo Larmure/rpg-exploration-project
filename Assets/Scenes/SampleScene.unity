@@ -998,6 +998,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   isGrounded: 0
+  animator: {fileID: 1648047730}
+  spriteRenderer: {fileID: 1648047727}
 --- !u!95 &1648047730
 Animator:
   serializedVersion: 7
