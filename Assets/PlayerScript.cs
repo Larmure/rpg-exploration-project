@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool("IsWalking", isWalking);
+            animator.SetBool("IsAir", !isGrounded);
         }
 
         if (isWalking && spriteRenderer != null)
