@@ -10,6 +10,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float jumpForce = 3f;
 
+    [Header("Fall Tuning")]
+    [SerializeField] private float fallGravityMultiplier = 2.5f;
+    [SerializeField] private float lowJumpGravityMultiplier = 2f;
+    [SerializeField] private float groundAcceleration = 60f;
+    [SerializeField] private float airAcceleration = 30f;
+
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.2f;
@@ -48,6 +54,20 @@ public class PlayerController : MonoBehaviour
             ApplyJump();
         }
         jumpRequested = false;
+
+        ApplyBetterGravity();
+    }
+
+    private void ApplyBetterGravity()
+    {
+        if (rigidBody.linearVelocity.y < 0f)
+        {
+            rigidBody.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallGravityMultiplier - 1f) * Time.fixedDeltaTime;
+        }
+        else if (rigidBody.linearVelocity.y > 0f && !Input.GetKey(KeyCode.Z) && !Input.GetKey(KeyCode.W))
+        {
+            rigidBody.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpGravityMultiplier - 1f) * Time.fixedDeltaTime;
+        }
     }
 
     private void ReadMovementInput()
@@ -97,7 +117,11 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyMovement()
     {
-        rigidBody.linearVelocity = new Vector2(moveInput * moveSpeed, rigidBody.linearVelocity.y);
+        float targetSpeed = moveInput * moveSpeed;
+        float acceleration = isGrounded ? groundAcceleration : airAcceleration;
+        float newSpeedX = Mathf.MoveTowards(rigidBody.linearVelocity.x, targetSpeed, acceleration * Time.fixedDeltaTime);
+
+        rigidBody.linearVelocity = new Vector2(newSpeedX, rigidBody.linearVelocity.y);
     }
 
     private void ApplyJump()
