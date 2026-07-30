@@ -5,16 +5,21 @@ public class PlayerScript : MonoBehaviour
     [Header("Stats")]
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int currentHealth;
-    [SerializeField] private float invincibilityDuration = 1f; // prevents taking damage repeatedly in a row
+    [SerializeField] private float invincibilityDuration = 1f;
     [SerializeField] private float moveSpeed = 5f;
 
     private Rigidbody2D rb;
+    private Animator animator;
     private Vector2 moveInput;
     private bool isInvincible = false;
+
+    private float lastMoveX = 0f;
+    private float lastMoveY = -1f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         currentHealth = maxHealth;
     }
 
@@ -29,11 +34,33 @@ public class PlayerScript : MonoBehaviour
         if (Input.GetKey(KeyCode.D)) horizontal = 1f;
 
         moveInput = new Vector2(horizontal, vertical).normalized;
+
+        UpdateAnimator();
     }
 
     void FixedUpdate()
     {
         rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    private void UpdateAnimator()
+    {
+        if (animator == null) return;
+
+        bool isMoving = moveInput.sqrMagnitude > 0.01f;
+
+        if (isMoving)
+        {
+            animator.SetFloat("MoveX", moveInput.x);
+            animator.SetFloat("MoveY", moveInput.y);
+            lastMoveX = moveInput.x;   
+            lastMoveY = moveInput.y;
+        }
+        else
+        {
+            animator.SetFloat("MoveX", lastMoveX * 0.1f);
+            animator.SetFloat("MoveY", lastMoveY * 0.1f);
+        }
     }
 
     public void TakeDamage(int amount)
@@ -64,7 +91,6 @@ public class PlayerScript : MonoBehaviour
     private System.Collections.IEnumerator InvincibilityFrames()
     {
         isInvincible = true;
-        // Optional: add a visual blink effect here
         yield return new WaitForSeconds(invincibilityDuration);
         isInvincible = false;
     }
@@ -72,7 +98,6 @@ public class PlayerScript : MonoBehaviour
     private void Die()
     {
         Debug.Log("Player died!");
-        // Add here: death animation, game over screen, scene reload, etc.
     }
 
     public int GetCurrentHealth() => currentHealth;
