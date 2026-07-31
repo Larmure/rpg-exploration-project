@@ -8,10 +8,16 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float invincibilityDuration = 1f;
     [SerializeField] private float moveSpeed = 5f;
 
+    [Header("Attack")]
+    [SerializeField] private float attackDuration = 0.13f; // A changer en fonction de la durée de l'animation etc...s
+    [SerializeField] private float attackCooldown = 0.2f;
+
     private Rigidbody2D rb;
     private Animator animator;
     private Vector2 moveInput;
     private bool isInvincible = false;
+    private bool isAttacking = false;
+    private float attackCooldownTimer = 0f;
 
     private float lastMoveX = 0f;
     private float lastMoveY = -1f;
@@ -25,17 +31,48 @@ public class PlayerScript : MonoBehaviour
 
     void Update()
     {
+        HandleInput();
+        UpdateAnimator();
+
+        if (attackCooldownTimer > 0f)
+            attackCooldownTimer -= Time.deltaTime;
+    }
+
+    private void HandleInput()
+    {
         float horizontal = 0f;
         float vertical = 0f;
 
-        if (Input.GetKey(KeyCode.W)) vertical = 1f;
-        if (Input.GetKey(KeyCode.S)) vertical = -1f;
-        if (Input.GetKey(KeyCode.A)) horizontal = -1f;
-        if (Input.GetKey(KeyCode.D)) horizontal = 1f;
+        if (!isAttacking)
+        {
+            if (Input.GetKey(KeyCode.W)) vertical = 1f;
+            if (Input.GetKey(KeyCode.S)) vertical = -1f;
+            if (Input.GetKey(KeyCode.A)) horizontal = -1f;
+            if (Input.GetKey(KeyCode.D)) horizontal = 1f;
+        }
 
         moveInput = new Vector2(horizontal, vertical).normalized;
 
-        UpdateAnimator();
+        if (Input.GetKeyDown(KeyCode.Space) && !isAttacking && attackCooldownTimer <= 0f)
+        {
+            Attack();
+        }
+    }
+
+    private void Attack()
+    {
+        isAttacking = true;
+        moveInput = Vector2.zero; 
+        attackCooldownTimer = attackCooldown;
+
+        animator.SetTrigger("Attack");
+
+        Invoke(nameof(EndAttack), attackDuration);
+    }
+
+    private void EndAttack()
+    {
+        isAttacking = false;
     }
 
     void FixedUpdate()
@@ -53,7 +90,8 @@ public class PlayerScript : MonoBehaviour
         {
             animator.SetFloat("MoveX", moveInput.x);
             animator.SetFloat("MoveY", moveInput.y);
-            lastMoveX = moveInput.x;   
+
+            lastMoveX = moveInput.x;
             lastMoveY = moveInput.y;
         }
         else

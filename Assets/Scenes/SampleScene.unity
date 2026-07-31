@@ -487,6 +487,8 @@ MonoBehaviour:
   currentHealth: 0
   invincibilityDuration: 1
   moveSpeed: 7
+  attackDuration: 0.33
+  attackCooldown: 0.2
 --- !u!50 &1648047730
 Rigidbody2D:
   serializedVersion: 5
