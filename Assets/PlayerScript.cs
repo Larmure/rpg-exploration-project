@@ -9,8 +9,12 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     [Header("Attack")]
-    [SerializeField] private float attackDuration = 0.13f; // A changer en fonction de la durée de l'animation etc...s
+    [SerializeField] private float attackDuration = 0.4f;
     [SerializeField] private float attackCooldown = 0.2f;
+    [SerializeField] private int attackDamage = 10;
+    [SerializeField] private float attackDistance = 0.5f;
+    [SerializeField] private float attackRadius = 0.8f;
+    [SerializeField] private LayerMask enemyLayer;
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -62,12 +66,30 @@ public class PlayerScript : MonoBehaviour
     private void Attack()
     {
         isAttacking = true;
-        moveInput = Vector2.zero; 
+        moveInput = Vector2.zero;
         attackCooldownTimer = attackCooldown;
 
         animator.SetTrigger("Attack");
 
+        Invoke(nameof(DealDamage), attackDuration * 0.5f);
         Invoke(nameof(EndAttack), attackDuration);
+    }
+
+    private void DealDamage()
+    {
+        Vector2 attackDir = new Vector2(lastMoveX, lastMoveY);
+        Vector2 attackPos = (Vector2)transform.position + attackDir * attackDistance;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, attackRadius, enemyLayer);
+
+        foreach (Collider2D hit in hits)
+        {
+            EnemyScript enemy = hit.GetComponent<EnemyScript>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(attackDamage);
+            }
+        }
     }
 
     private void EndAttack()
@@ -86,7 +108,12 @@ public class PlayerScript : MonoBehaviour
 
         bool isMoving = moveInput.sqrMagnitude > 0.01f;
 
-        if (isMoving)
+        if (isAttacking)
+        {
+            animator.SetFloat("MoveX", lastMoveX);
+            animator.SetFloat("MoveY", lastMoveY);
+        }
+        else if (isMoving)
         {
             animator.SetFloat("MoveX", moveInput.x);
             animator.SetFloat("MoveY", moveInput.y);
@@ -140,4 +167,14 @@ public class PlayerScript : MonoBehaviour
 
     public int GetCurrentHealth() => currentHealth;
     public int GetMaxHealth() => maxHealth;
+
+    // Debug 
+    private void OnDrawGizmosSelected()
+    {
+        Vector2 attackDir = new Vector2(lastMoveX, lastMoveY);
+        Vector2 attackPos = (Vector2)transform.position + attackDir * attackDistance;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPos, attackRadius);
+    }
 }
