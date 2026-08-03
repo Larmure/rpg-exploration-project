@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c410d3ec852b8aa4fba326c770011ec7, type: 3}
+  m_Name: HealPotion
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: Healing Potion
+  description: Heal you 15 HP
+  icon: {fileID: 2099718416087951911, guid: fd74ed9974675ef23a06c3cd36fa4074, type: 3}
+  itemType: 0
+  equipSlot: 0
+  isStackable: 1
+  maxStackSize: 99
+  attackBonus: 0
+  defenseBonus: 0
+  healAmount: 10
