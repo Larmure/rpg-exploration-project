@@ -27,21 +27,48 @@ public class TransitionManager : MonoBehaviour
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+{
+    SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        SpawnPoint[] points = FindObjectsByType<SpawnPoint>(FindObjectsSortMode.None);
-        foreach (var point in points)
+    Debug.Log($"[Transition] Scène chargée : {scene.name}, spawnId recherché : '{pendingSpawnId}'");
+
+    SpawnPoint[] points = FindObjectsByType<SpawnPoint>(FindObjectsSortMode.None);
+    Debug.Log($"[Transition] {points.Length} SpawnPoint(s) trouvé(s) dans la scène.");
+
+    bool found = false;
+
+    foreach (var point in points)
+    {
+        Debug.Log($"[Transition] SpawnPoint trouvé avec id='{point.id}' à la position {point.transform.position}");
+
+        if (point.id == pendingSpawnId)
         {
-            if (point.id == pendingSpawnId)
+            GameObject[] allPlayers = GameObject.FindGameObjectsWithTag("Player");
+            Debug.Log($"[Transition] {allPlayers.Length} objet(s) taggé(s) 'Player' trouvé(s).");
+
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
             {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
+                Debug.Log($"[Transition] Position AVANT : {player.transform.position}");
+
+                Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+                if (rb != null)
                 {
-                    player.transform.position = point.transform.position;
+                    rb.position = point.transform.position;
                 }
-                break;
+                player.transform.position = point.transform.position;
+
+                Debug.Log($"[Transition] Position APRÈS : {player.transform.position}");
+
+                found = true;
             }
+            break;
         }
     }
+
+    if (!found)
+    {
+        Debug.LogWarning($"TransitionManager : aucun SpawnPoint avec l'id '{pendingSpawnId}' trouvé dans '{scene.name}'.");
+    }
+}
 }
