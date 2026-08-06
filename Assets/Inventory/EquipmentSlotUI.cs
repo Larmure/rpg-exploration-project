@@ -38,8 +38,17 @@ public class EquipmentSlotUI : MonoBehaviour,
     public void Refresh()
     {
         ItemData item = GetEquippedItem();
-        iconImage.enabled = item != null;
-        if (item != null) iconImage.sprite = item.icon;
+
+        if (item != null)
+        {
+            iconImage.enabled = true;
+            iconImage.sprite = item.icon;
+            iconImage.color = Color.white; 
+        }
+        else
+        {
+            iconImage.color = new Color(1f, 1f, 1f, 0.3f);
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
