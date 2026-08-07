@@ -59,7 +59,7 @@ public class EnemyScript : MonoBehaviour
 
         float distance = Vector2.Distance(transform.position, player.position);
 
-        if (distance <= attackRange && attackCooldownTimer <= 0f)
+        if (distance <= attackRange + 0.2f)
         {
             AttackPlayer();
         }
@@ -68,6 +68,8 @@ public class EnemyScript : MonoBehaviour
     private void AttackPlayer()
     {
         Vector2 direction = (player.position - transform.position).normalized;
+
+        Debug.Log($"Attack direction: X={direction.x:F2}, Y={direction.y:F2}");
 
         animator.SetFloat("MoveX", direction.x);
         animator.SetFloat("MoveY", direction.y);
@@ -83,7 +85,13 @@ public class EnemyScript : MonoBehaviour
         if (player == null) return;
 
         float distance = Vector2.Distance(transform.position, player.position);
-        if (distance <= attackRange) // vérifie que le joueur n'a pas fui entre-temps
+        Debug.Log($"DealDamage appelé - distance: {distance}, attackRange: {attackRange}");
+        
+        float dx = Mathf.Abs(transform.position.x - player.position.x);
+        float dy = Mathf.Abs(transform.position.y - player.position.y);
+        Debug.Log($"dx={dx:F3} dy={dy:F3} distance={Vector2.Distance(transform.position, player.position):F3}");
+        
+        if (distance <= attackRange + 0.2f)
         {
             PlayerScript playerScript = player.GetComponent<PlayerScript>();
             if (playerScript != null)
