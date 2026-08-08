@@ -25,6 +25,7 @@ public class PlayerScript : MonoBehaviour
 
     private float lastMoveX = 0f;
     private float lastMoveY = -1f;
+    private bool isDead = false;
 
     void Start()
     {
@@ -35,6 +36,8 @@ public class PlayerScript : MonoBehaviour
 
     void Update()
     {
+        if (isDead) return;
+
         HandleInput();
         UpdateAnimator();
 
@@ -99,6 +102,8 @@ public class PlayerScript : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isDead) return;
+
         rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
     }
 
@@ -130,7 +135,7 @@ public class PlayerScript : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        if (isInvincible) return;
+        if (isInvincible || isDead) return;
 
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0);
@@ -162,7 +167,23 @@ public class PlayerScript : MonoBehaviour
 
     private void Die()
     {
+        if (isDead) return;
+        isDead = true;
+
         Debug.Log("Player died!");
+
+        if (animator != null)
+            animator.SetTrigger("Death");
+
+        // Plus de délai en dur — c'est l'Animation Event qui appellera
+        // OnDeathAnimationComplete() à la fin du clip, quelle que soit sa durée
+    }
+
+    // Appelée automatiquement par l'Animation Event placé sur la dernière frame du clip "Death"
+    public void OnDeathAnimationComplete()
+    {
+        if (GameOverManager.Instance != null)
+            GameOverManager.Instance.TriggerGameOver();
     }
 
     public int GetCurrentHealth() => currentHealth;

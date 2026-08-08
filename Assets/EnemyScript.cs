@@ -52,6 +52,8 @@ public class EnemyScript : MonoBehaviour
 
     void Update()
     {
+        if (GameOverManager.IsGameOver) return;
+
         if (attackCooldownTimer > 0f)
             attackCooldownTimer -= Time.deltaTime;
 
@@ -82,6 +84,7 @@ public class EnemyScript : MonoBehaviour
 
     private void DealDamage()
     {
+        if (GameOverManager.IsGameOver) return;
         if (player == null) return;
 
         float distance = Vector2.Distance(transform.position, player.position);
