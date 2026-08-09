@@ -2,9 +2,12 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
+
+    public static PlayerScript instance;
+
     [Header("Stats")]
-    [SerializeField] private int maxHealth = 100;
-    [SerializeField] private int currentHealth;
+    [SerializeField] public int maxHealth = 100;
+    [SerializeField] public int currentHealth = 100;
     [SerializeField] private float invincibilityDuration = 1f;
     [SerializeField] private float moveSpeed = 5f;
 
@@ -26,11 +29,22 @@ public class PlayerScript : MonoBehaviour
     private float lastMoveX = 0f;
     private float lastMoveY = -1f;
 
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        currentHealth = maxHealth;
     }
 
     void Update()
