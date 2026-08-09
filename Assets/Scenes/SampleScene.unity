@@ -673,7 +673,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc9163a6158b10f699283f7d6671350, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameOverManager
-  gameOverPanel: {fileID: 567908848}
+  gameOverPanel: {fileID: 1288052151}
 --- !u!4 &589864260
 Transform:
   m_ObjectHideFlags: 0
