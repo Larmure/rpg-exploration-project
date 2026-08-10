@@ -23,20 +23,20 @@ public class Item : MonoBehaviour
         Debug.Log($"Using {nameItem}");
     }
 
-    public virtual void AddItemToInventory()
+    public virtual void AddItemToHotbar()
     {
         var haveFoundItem = false;
 
-        for (int i = 0; i < Inventory.instance.inventories.Length; i++)
+        for (int i = 0; i < Hotbar.instance.inventories.Length; i++)
         {
-            if(Inventory.instance.inventories[i] != null)
+            if(Hotbar.instance.inventories[i] != null)
             {
-                if(Inventory.instance.inventories[i].nameItem == this.nameItem)
+                if(Hotbar.instance.inventories[i].nameItem == this.nameItem)
                 {
-                    if(Inventory.instance.inventories[i].amount < 99)
+                    if(Hotbar.instance.inventories[i].amount < 99)
                     {
                         haveFoundItem = true;
-                        Inventory.instance.inventories[i].amount += amount;
+                        Hotbar.instance.inventories[i].amount += amount;
                         break;
                     }
                 }
@@ -45,35 +45,35 @@ public class Item : MonoBehaviour
 
         if(haveFoundItem == false)
         {
-            for (int i = 0; i < Inventory.instance.inventories.Length; i++)
+            for (int i = 0; i < Hotbar.instance.inventories.Length; i++)
             {
-                if(Inventory.instance.inventories[i] == null)
+                if(Hotbar.instance.inventories[i] == null)
                 {
-                    Inventory.instance.inventories[i] = this;
+                    Hotbar.instance.inventories[i] = this;
                     break;
                 }
             }
         }
 
-        Inventory.instance.LoadInventory();
+        Hotbar.instance.LoadHotbar();
 
         if (haveFoundItem) Destroy(gameObject);
     }
 
-    public virtual void RemoveItemFromInventory()
+    public virtual void RemoveItemFromHotbar()
     {
-        for (int i = 0; i < Inventory.instance.inventories.Length; i++)
+        for (int i = 0; i < Hotbar.instance.inventories.Length; i++)
         {
-            if(Inventory.instance.inventories[i] != null)
+            if(Hotbar.instance.inventories[i] != null)
             {
-                if(Inventory.instance.inventories[i].nameItem == this.nameItem)
+                if(Hotbar.instance.inventories[i].nameItem == this.nameItem)
                 {
-                    Inventory.instance.inventories[i].amount -= amount;
+                    Hotbar.instance.inventories[i].amount -= amount;
 
-                    if(Inventory.instance.inventories[i].amount <= 0)
+                    if(Hotbar.instance.inventories[i].amount <= 0)
                     {
-                        Inventory.instance.inventories[i] = null;
-                        Inventory.instance.LoadInventory();
+                        Hotbar.instance.inventories[i] = null;
+                        Hotbar.instance.LoadHotbar();
                         Destroy(gameObject);
                     }
 
@@ -81,7 +81,7 @@ public class Item : MonoBehaviour
                 }
             }
         }
-        Inventory.instance.LoadInventory();
+        Hotbar.instance.LoadHotbar();
     }
 
     public virtual void OnTriggerEnter2D(Collider2D collision)
@@ -102,9 +102,9 @@ public class Item : MonoBehaviour
 
             isUsed = true;
 
-            AddItemToInventory();
+            AddItemToHotbar();
 
-            Inventory.instance.LoadInventory();
+            Hotbar.instance.LoadHotbar();
         }
     }
 

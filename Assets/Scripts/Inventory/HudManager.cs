@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class HUD_Manager : MonoBehaviour
+public class HudManager : MonoBehaviour
 {
     public TextMeshProUGUI healthText;
 
-    public static HUD_Manager instance;
+    public static HudManager instance;
 
     private void Awake()
     {
@@ -16,6 +16,6 @@ public class HUD_Manager : MonoBehaviour
 
     private void Update()
     {
-        healthText.text = $"Health : {PlayerScript.instance.currentHealth}/{PlayerScript.instance.maxHealth}";
+        healthText.text = $"HP {PlayerScript.instance.currentHealth}/{PlayerScript.instance.maxHealth}";
     }
 }
