@@ -12429,11 +12429,11 @@ MonoBehaviour:
   currentHealth: 50
   invincibilityDuration: 1
   moveSpeed: 7
-  attackDuration: 0.85
+  attackDuration: 0.5
   attackCooldown: 0.5
   attackDamage: 10
-  attackDistance: 0.5
-  attackRadius: 0.65
+  attackDistance: 0.55
+  attackRadius: 0.75
   enemyLayer:
     serializedVersion: 2
     m_Bits: 128
