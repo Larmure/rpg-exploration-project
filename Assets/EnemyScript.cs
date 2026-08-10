@@ -42,12 +42,9 @@ public class EnemyScript : MonoBehaviour
     public int GetCurrentHealth() => currentHealth;
     public int GetMaxHealth() => maxHealth;
 
-    void OnTriggerEnter2D(Collider2D other)
+    public void PlayerDetected()
     {
-        if (other.CompareTag("Player"))
-        {
-            animator.SetTrigger("PlayerNear");
-        }
+        animator.SetTrigger("PlayerNear");
     }
 
     void Update()
