@@ -12429,8 +12429,8 @@ MonoBehaviour:
   currentHealth: 50
   invincibilityDuration: 1
   moveSpeed: 7
-  attackDuration: 0.33
-  attackCooldown: 0.2
+  attackDuration: 0.85
+  attackCooldown: 0.5
   attackDamage: 10
   attackDistance: 0.5
   attackRadius: 0.65

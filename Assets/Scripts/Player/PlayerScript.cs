@@ -29,6 +29,8 @@ public class PlayerScript : MonoBehaviour
     private float lastMoveX = 0f;
     private float lastMoveY = -1f;
     private bool isDead = false;
+    private Vector2 attackDirection = Vector2.down;
+    private Camera mainCamera;
 
     private void Awake()
     {
@@ -46,6 +48,7 @@ public class PlayerScript : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        mainCamera = Camera.main;
     }
 
     void Update()
@@ -64,13 +67,10 @@ public class PlayerScript : MonoBehaviour
         float horizontal = 0f;
         float vertical = 0f;
 
-        if (!isAttacking)
-        {
-            if (Input.GetKey(KeyCode.W)) vertical = 1f;
-            if (Input.GetKey(KeyCode.S)) vertical = -1f;
-            if (Input.GetKey(KeyCode.A)) horizontal = -1f;
-            if (Input.GetKey(KeyCode.D)) horizontal = 1f;
-        }
+        if (Input.GetKey(KeyCode.W)) vertical = 1f;
+        if (Input.GetKey(KeyCode.S)) vertical = -1f;
+        if (Input.GetKey(KeyCode.A)) horizontal = -1f;
+        if (Input.GetKey(KeyCode.D)) horizontal = 1f;
 
         moveInput = new Vector2(horizontal, vertical).normalized;
 
@@ -80,22 +80,46 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    private Vector2 GetMouseDirection()
+    {
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        if (mainCamera == null)
+            return new Vector2(lastMoveX, lastMoveY);
+
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = -mainCamera.transform.position.z; 
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreenPos);
+
+        Vector2 dir = (Vector2)mouseWorldPos - (Vector2)transform.position;
+
+        if (dir.sqrMagnitude < 0.0001f)
+            return new Vector2(lastMoveX, lastMoveY);
+
+        return dir.normalized;
+    }
+
     private void Attack()
     {
+        animator.SetBool("IsAttacking", true);
         isAttacking = true;
         moveInput = Vector2.zero;
         attackCooldownTimer = attackCooldown;
 
+        attackDirection = GetMouseDirection();
+        lastMoveX = attackDirection.x;
+        lastMoveY = attackDirection.y;
+
         animator.SetTrigger("Attack");
+        animator.SetBool("IsAttacking", true);
 
         Invoke(nameof(DealDamage), attackDuration * 0.5f);
-        Invoke(nameof(EndAttack), attackDuration);
     }
 
     private void DealDamage()
     {
-        Vector2 attackDir = new Vector2(lastMoveX, lastMoveY);
-        Vector2 attackPos = (Vector2)transform.position + attackDir * attackDistance;
+        Vector2 attackPos = (Vector2)transform.position + attackDirection * attackDistance;
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, attackRadius, enemyLayer);
 
@@ -109,9 +133,10 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    private void EndAttack()
+    public void EndAttack()
     {
         isAttacking = false;
+        animator.SetBool("IsAttacking", false);
     }
 
     void FixedUpdate()
@@ -129,21 +154,44 @@ public class PlayerScript : MonoBehaviour
 
         if (isAttacking)
         {
-            animator.SetFloat("MoveX", lastMoveX);
-            animator.SetFloat("MoveY", lastMoveY);
-        }
-        else if (isMoving)
-        {
-            animator.SetFloat("MoveX", moveInput.x);
-            animator.SetFloat("MoveY", moveInput.y);
-
-            lastMoveX = moveInput.x;
-            lastMoveY = moveInput.y;
+            Vector2 dir = attackDirection;
+            if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
+            {
+                animator.SetFloat("MoveX", Mathf.Sign(dir.x));
+                animator.SetFloat("MoveY", 0f);
+            }
+            else
+            {
+                animator.SetFloat("MoveX", 0f);
+                animator.SetFloat("MoveY", Mathf.Sign(dir.y));
+            }
         }
         else
         {
-            animator.SetFloat("MoveX", lastMoveX * 0.1f);
-            animator.SetFloat("MoveY", lastMoveY * 0.1f);
+        Vector2 dir = GetMouseDirection();
+
+            if (isMoving)
+            {
+                animator.SetFloat("MoveX", moveInput.x);
+                animator.SetFloat("MoveY", moveInput.y);
+            }
+
+            if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
+            {
+                lastMoveX = Mathf.Sign(dir.x);
+                lastMoveY = 0f;
+            }
+            else
+            {
+                lastMoveX = 0f;
+                lastMoveY = Mathf.Sign(dir.y);
+            }
+
+            if (!isMoving)
+            {
+                animator.SetFloat("MoveX", lastMoveX * 0.1f);
+                animator.SetFloat("MoveY", lastMoveY * 0.1f);
+            }
         }
     }
 
@@ -206,8 +254,7 @@ public class PlayerScript : MonoBehaviour
     // Debug 
     private void OnDrawGizmosSelected()
     {
-        Vector2 attackDir = new Vector2(lastMoveX, lastMoveY);
-        Vector2 attackPos = (Vector2)transform.position + attackDir * attackDistance;
+        Vector2 attackPos = (Vector2)transform.position + attackDirection * attackDistance;
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPos, attackRadius);
