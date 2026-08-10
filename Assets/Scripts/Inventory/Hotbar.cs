@@ -7,7 +7,7 @@ public class Hotbar : MonoBehaviour
 {
     public static Hotbar instance;
     public Item[] inventories = new Item[6];
-    public Transform inventoryDisplay;
+    public Transform hotbarDisplay;
     private Sprite blankItem;
     public int currentHotbarIndex = 0;
     public Item currentItem;
@@ -19,7 +19,7 @@ public class Hotbar : MonoBehaviour
 
     private void Start()
     {
-        blankItem = inventoryDisplay.transform.GetChild(0).transform.Find("Icon").GetComponent<Image>().sprite;
+        blankItem = hotbarDisplay.transform.GetChild(0).transform.Find("Icon").GetComponent<Image>().sprite;
     }
 
     public void LoadHotbar()
@@ -31,10 +31,10 @@ public class Hotbar : MonoBehaviour
 
             if(inventories[i] == null)
             {
-                inventoryDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "";
-                inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = blankItem;
-                inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
-                inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
+                hotbarDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "";
+                hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = blankItem;
+                hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
+                hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
                     delegate { 
                         Debug.Log("Empty Slot");
                         SetSlot(index);
@@ -43,27 +43,27 @@ public class Hotbar : MonoBehaviour
                 continue;   
             }
 
-            inventoryDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "" + inventories[i].amount;
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = inventories[i].icon;
+            hotbarDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "" + inventories[i].amount;
+            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = inventories[i].icon;
 
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
+            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
+            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
                 delegate { 
                         inventories[index].UseItem();
                         SetSlot(index);
                         });
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().interactable = true;
+            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().interactable = true;
 
         }
     }
 
     private void SetSlot(int index)
     {
-        foreach (Transform slot in inventoryDisplay)
+        foreach (Transform slot in hotbarDisplay)
         {
             slot.transform.Find("Outline").gameObject.SetActive(false);
         }
-        inventoryDisplay.transform.GetChild(index).transform.Find("Outline").gameObject.SetActive(true);
+        hotbarDisplay.transform.GetChild(index).transform.Find("Outline").gameObject.SetActive(true);
     }
 
     private void Update()

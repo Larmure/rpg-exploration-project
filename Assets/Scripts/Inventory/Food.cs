@@ -21,7 +21,8 @@ public class Food : Item
                 PlayerScript.instance.currentHealth += amount;
                 break;
         }
-        RemoveItemFromHotbar();
+        RemoveItem();
+        Inventory.instance.LoadInventory();
         Hotbar.instance.LoadHotbar();
     }
 
