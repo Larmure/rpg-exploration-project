@@ -20,6 +20,8 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float attackDistance = 0.5f;
     [SerializeField] private float attackRadius = 0.8f;
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float weaponKnockbackForce = 6f; 
+    [SerializeField] private float weaponKnockbackDuration = 0.15f; 
 
     [Header("Knockback")]
     private bool isKnockedBack = false;
@@ -161,6 +163,8 @@ public class PlayerScript : MonoBehaviour
             EnemyScript enemy = hit.GetComponent<EnemyScript>();
             if (enemy != null)
             {
+                Vector2 knockDir = (enemy.transform.position - transform.position).normalized;
+                enemy.ApplyKnockback(knockDir, weaponKnockbackForce, weaponKnockbackDuration);
                 enemy.TakeDamage(attackDamage);
             }
         }

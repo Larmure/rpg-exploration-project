@@ -16,11 +16,19 @@ public class EnemyScript : MonoBehaviour
 
     [SerializeField] private float knockbackForce = 8f;
     [SerializeField] private float knockbackDuration = 0.2f; 
+    private Rigidbody2D rb;
+
+    [Header("Received Knockback")]
+    private bool isKnockedBack = false;
+    private Vector2 knockbackStartVelocity;
+    private float knockbackTimer = 0f;
+    private float receivedKnockbackDuration = 0f;
 
     void Start()
     {
         currentHealth = maxHealth;
         animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     public void TakeDamage(int amount)
@@ -67,11 +75,29 @@ public class EnemyScript : MonoBehaviour
         }
     }
 
+    void FixedUpdate()
+    {
+        if (isKnockedBack)
+        {
+            knockbackTimer += Time.fixedDeltaTime;
+            float t = Mathf.Clamp01(knockbackTimer / receivedKnockbackDuration);
+            float easedMultiplier = Mathf.Pow(1f - t, 2f);
+
+            Vector2 currentKnockbackVelocity = knockbackStartVelocity * easedMultiplier;
+            rb.MovePosition(rb.position + currentKnockbackVelocity * Time.fixedDeltaTime);
+
+            if (t >= 1f)
+            {
+                isKnockedBack = false;
+            }
+        }
+    }
+
     private void AttackPlayer()
     {
         Vector2 direction = (player.position - transform.position).normalized;
 
-        Debug.Log($"Attack direction: X={direction.x:F2}, Y={direction.y:F2}");
+        // Debug.Log($"Attack direction: X={direction.x:F2}, Y={direction.y:F2}");
 
         animator.SetFloat("MoveX", direction.x);
         animator.SetFloat("MoveY", direction.y);
@@ -105,4 +131,12 @@ public class EnemyScript : MonoBehaviour
             }
         }
     }
+
+    public void ApplyKnockback(Vector2 direction, float force, float duration)
+    {
+        isKnockedBack = true;
+        knockbackStartVelocity = direction.normalized * force;
+        receivedKnockbackDuration = duration;
+        knockbackTimer = 0f;
+    }   
 }
