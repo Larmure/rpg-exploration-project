@@ -12427,7 +12427,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   maxHealth: 100
   currentHealth: 50
-  invincibilityDuration: 1
+  invincibilityDuration: 0.8
+  blinkInterval: 0.08
   moveSpeed: 7
   attackDuration: 0.5
   attackCooldown: 0.5

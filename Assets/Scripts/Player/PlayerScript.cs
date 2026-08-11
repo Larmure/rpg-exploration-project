@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] public int maxHealth = 100;
     [SerializeField] public int currentHealth = 100;
     [SerializeField] private float invincibilityDuration = 1f;
+    [SerializeField] private float blinkInterval = 0.005f;
     [SerializeField] private float moveSpeed = 5f;
 
     [Header("Attack")]
@@ -31,6 +33,7 @@ public class PlayerScript : MonoBehaviour
     private bool isDead = false;
     private Vector2 attackDirection = Vector2.down;
     private Camera mainCamera;
+    private SpriteRenderer spriteRenderer;
 
     private void Awake()
     {
@@ -49,6 +52,7 @@ public class PlayerScript : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         mainCamera = Camera.main;
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -74,9 +78,32 @@ public class PlayerScript : MonoBehaviour
 
         moveInput = new Vector2(horizontal, vertical).normalized;
 
-        if (Input.GetKeyDown(KeyCode.Space) && !isAttacking && attackCooldownTimer <= 0f)
+        bool attackPressed = Input.GetKeyDown(KeyCode.Space) 
+            || (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject());
+
+        if (attackPressed && !isAttacking && attackCooldownTimer <= 0f)
         {
             Attack();
+        }
+
+        bool usePressed = Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject(); 
+
+        if (usePressed)
+        {
+            UseCurrentItem();
+        }
+
+    }
+
+    private void UseCurrentItem()
+    {
+        if (Hotbar.instance == null) return;
+
+        Item current = Hotbar.instance.currentItem;
+
+        if (current != null)
+        {
+            current.UseItem();
         }
     }
 
@@ -223,7 +250,20 @@ public class PlayerScript : MonoBehaviour
     private System.Collections.IEnumerator InvincibilityFrames()
     {
         isInvincible = true;
-        yield return new WaitForSeconds(invincibilityDuration);
+
+        float elapsed = 0f;
+        while (elapsed < invincibilityDuration)
+        {
+            if (spriteRenderer != null)
+                spriteRenderer.enabled = !spriteRenderer.enabled;
+
+            yield return new WaitForSeconds(blinkInterval);
+            elapsed += blinkInterval;
+        }
+
+        if (spriteRenderer != null)
+            spriteRenderer.enabled = true;
+
         isInvincible = false;
     }
 

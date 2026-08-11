@@ -55,6 +55,7 @@ public class Hotbar : MonoBehaviour
             hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().interactable = true;
 
         }
+        currentItem = inventories[currentHotbarIndex];
     }
 
     private void SetSlot(int index)
@@ -68,67 +69,28 @@ public class Hotbar : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            // ToggleInventory();
-        }
-
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0f)
         {
             currentHotbarIndex += scroll > 0 ? 1 : -1;
             if (currentHotbarIndex < 0) currentHotbarIndex = inventories.Length - 1;
             if (currentHotbarIndex >= inventories.Length) currentHotbarIndex = 0;
-            SetSlot(currentHotbarIndex);
-            currentItem = inventories[currentHotbarIndex];
+            SelectSlot(currentHotbarIndex);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        for (int i = 0; i < inventories.Length && i < 9; i++)
         {
-            currentHotbarIndex = 0;
-            SetSlot(currentHotbarIndex);
-            if(inventories[currentHotbarIndex] != null)
-                inventories[currentHotbarIndex].UseItem();
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            {
+                SelectSlot(i);
+            }
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            currentHotbarIndex = 1;
-            SetSlot(currentHotbarIndex);
-            if(inventories[currentHotbarIndex] != null)
-                inventories[currentHotbarIndex].UseItem();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            currentHotbarIndex = 2;
-            SetSlot(currentHotbarIndex);
-            if(inventories[currentHotbarIndex] != null)
-                inventories[currentHotbarIndex].UseItem();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            currentHotbarIndex = 3;
-            SetSlot(currentHotbarIndex);
-            if(inventories[currentHotbarIndex] != null)
-                inventories[currentHotbarIndex].UseItem();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            currentHotbarIndex = 4;
-            SetSlot(currentHotbarIndex);
-            if(inventories[currentHotbarIndex] != null)
-                inventories[currentHotbarIndex].UseItem();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            currentHotbarIndex = 5;
-            SetSlot(currentHotbarIndex);
-            if(inventories[currentHotbarIndex] != null)
-                inventories[currentHotbarIndex].UseItem();
-        }
+    private void SelectSlot(int index)
+    {
+        currentHotbarIndex = index;
+        SetSlot(index);
+        currentItem = inventories[index];
     }
 }
