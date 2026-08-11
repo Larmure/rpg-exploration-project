@@ -12463,7 +12463,7 @@ MonoBehaviour:
   attackDuration: 0.5
   attackCooldown: 0.5
   attackDamage: 10
-  attackDistance: 0.55
+  attackDistance: 0.75
   attackRadius: 0.75
   enemyLayer:
     serializedVersion: 2
