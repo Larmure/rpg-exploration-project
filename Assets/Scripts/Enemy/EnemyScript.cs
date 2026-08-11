@@ -14,6 +14,9 @@ public class EnemyScript : MonoBehaviour
     [SerializeField] private int attackDamage = 10;
     [SerializeField] private float damageDelay = 0.3f;
 
+    [SerializeField] private float knockbackForce = 8f;
+    [SerializeField] private float knockbackDuration = 0.2f; 
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -85,17 +88,19 @@ public class EnemyScript : MonoBehaviour
         if (player == null) return;
 
         float distance = Vector2.Distance(transform.position, player.position);
-        Debug.Log($"DealDamage appelé - distance: {distance}, attackRange: {attackRange}");
+        // Debug.Log($"DealDamage appelé - distance: {distance}, attackRange: {attackRange}");
         
-        float dx = Mathf.Abs(transform.position.x - player.position.x);
-        float dy = Mathf.Abs(transform.position.y - player.position.y);
-        Debug.Log($"dx={dx:F3} dy={dy:F3} distance={Vector2.Distance(transform.position, player.position):F3}");
+        // float dx = Mathf.Abs(transform.position.x - player.position.x);
+        // float dy = Mathf.Abs(transform.position.y - player.position.y);
+        // Debug.Log($"dx={dx:F3} dy={dy:F3} distance={Vector2.Distance(transform.position, player.position):F3}");
         
         if (distance <= attackRange + 0.2f)
         {
             PlayerScript playerScript = player.GetComponent<PlayerScript>();
             if (playerScript != null)
             {
+                Vector2 knockDir = (player.position - transform.position).normalized;
+                playerScript.ApplyKnockback(knockDir, knockbackForce, knockbackDuration);
                 playerScript.TakeDamage(attackDamage);
             }
         }

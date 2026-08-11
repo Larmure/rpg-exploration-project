@@ -6268,6 +6268,8 @@ MonoBehaviour:
   maxHealth: 30
   attackDamage: 10
   damageDelay: 0.3
+  knockbackForce: 15
+  knockbackDuration: 0.2
 --- !u!212 &846836992
 SpriteRenderer:
   serializedVersion: 3
@@ -12428,7 +12430,7 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 50
   invincibilityDuration: 0.8
-  blinkInterval: 0.08
+  blinkInterval: 0.06
   moveSpeed: 7
   attackDuration: 0.5
   attackCooldown: 0.5

@@ -21,6 +21,12 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float attackRadius = 0.8f;
     [SerializeField] private LayerMask enemyLayer;
 
+    [Header("Knockback")]
+    private bool isKnockedBack = false;
+    private Vector2 knockbackStartVelocity;
+    private float knockbackTimer = 0f;
+    private float knockbackDuration = 0f;
+
     private Rigidbody2D rb;
     private Animator animator;
     private Vector2 moveInput;
@@ -170,7 +176,24 @@ public class PlayerScript : MonoBehaviour
     {
         if (isDead) return;
 
-        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+        if (isKnockedBack)
+        {
+            knockbackTimer += Time.fixedDeltaTime;
+            float t = Mathf.Clamp01(knockbackTimer / knockbackDuration);
+            float easedMultiplier = Mathf.Pow(1f - t, 2f);
+
+            Vector2 currentKnockbackVelocity = knockbackStartVelocity * easedMultiplier;
+            rb.MovePosition(rb.position + currentKnockbackVelocity * Time.fixedDeltaTime);
+
+            if (t >= 1f)
+            {
+                isKnockedBack = false;
+            }
+        }
+        else
+        {
+            rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+        }
     }
 
     private void UpdateAnimator()
@@ -290,6 +313,16 @@ public class PlayerScript : MonoBehaviour
 
     public int GetCurrentHealth() => currentHealth;
     public int GetMaxHealth() => maxHealth;
+
+    public void ApplyKnockback(Vector2 direction, float force, float duration)
+    {
+        if (isDead || isInvincible) return;
+
+        isKnockedBack = true;
+        knockbackStartVelocity = direction.normalized * force;
+        knockbackDuration = duration;
+        knockbackTimer = 0f;
+    }
 
     // Debug 
     private void OnDrawGizmosSelected()
