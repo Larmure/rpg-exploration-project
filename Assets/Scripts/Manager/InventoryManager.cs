@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class Inventory : MonoBehaviour
+public class InventoryManager : MonoBehaviour
 {
-    public static Inventory instance;
+    public static InventoryManager instance;
     public Item[] inventories = new Item[24];
     public Transform inventoryDisplay;
     private bool isInventoryOpen = false;

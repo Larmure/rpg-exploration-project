@@ -9,6 +9,7 @@ public class PlayerScript : MonoBehaviour
     [Header("Stats")]
     [SerializeField] public int maxHealth = 100;
     [SerializeField] public int currentHealth = 100;
+    [SerializeField] public int armorPoints = 0;
     [SerializeField] private float invincibilityDuration = 1f;
     [SerializeField] private float blinkInterval = 0.005f;
     [SerializeField] private float moveSpeed = 5f;
@@ -22,6 +23,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private float weaponKnockbackForce = 6f; 
     [SerializeField] private float weaponKnockbackDuration = 0.15f; 
+    
 
     [Header("Knockback")]
     private bool isKnockedBack = false;
@@ -105,9 +107,9 @@ public class PlayerScript : MonoBehaviour
 
     private void UseCurrentItem()
     {
-        if (Hotbar.instance == null) return;
+        if (HotbarManager.instance == null) return;
 
-        Item current = Hotbar.instance.currentItem;
+        Item current = HotbarManager.instance.currentItem;
 
         if (current != null)
         {

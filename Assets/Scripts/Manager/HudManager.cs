@@ -6,6 +6,7 @@ using TMPro;
 public class HudManager : MonoBehaviour
 {
     public TextMeshProUGUI healthText;
+    public TextMeshProUGUI armorText;
 
     public static HudManager instance;
 
@@ -17,5 +18,6 @@ public class HudManager : MonoBehaviour
     private void Update()
     {
         healthText.text = $"HP {PlayerScript.instance.currentHealth}/{PlayerScript.instance.maxHealth}";
+        armorText.text = $"Armor {PlayerScript.instance.armorPoints}";  
     }
 }

@@ -5,17 +5,19 @@ using UnityEngine;
 [System.Serializable]
 public enum ItemType
 {
-    food, ressource
+    food, armor
 }
 
 public class Item : MonoBehaviour
 {
+    public ItemType ItemType;
 
-    public ItemType itemType;
     public Sprite icon;
     public string nameItem;
     public int amount;
     public bool isUsed;
+
+    protected virtual void Awake() { }
 
     public virtual void UseItem()
     {
@@ -24,13 +26,13 @@ public class Item : MonoBehaviour
 
     public virtual bool AddItemToHotbar()
     {
-        return TryAddItemToArray(Hotbar.instance.inventories, Hotbar.instance.LoadHotbar);
+        return TryAddItemToArray(HotbarManager.instance.inventories, HotbarManager.instance.LoadHotbar);
     }
 
     public virtual bool AddItemToInventory()
     {
-        if (Inventory.instance == null) return false;
-        return TryAddItemToArray(Inventory.instance.inventories, Inventory.instance.LoadInventory);
+        if (InventoryManager.instance == null) return false;
+        return TryAddItemToArray(InventoryManager.instance.inventories, InventoryManager.instance.LoadInventory);
     }
 
     private bool TryAddItemToArray(Item[] items, System.Action reload)
@@ -78,13 +80,13 @@ public class Item : MonoBehaviour
 
     public virtual bool RemoveItemFromHotbar()
     {
-        return TryRemoveItemFromArray(Hotbar.instance.inventories, Hotbar.instance.LoadHotbar);
+        return TryRemoveItemFromArray(HotbarManager.instance.inventories, HotbarManager.instance.LoadHotbar);
     }
 
     public virtual bool RemoveItemFromInventory()
     {
-        if (Inventory.instance == null) return false;
-        return TryRemoveItemFromArray(Inventory.instance.inventories, Inventory.instance.LoadInventory);
+        if (InventoryManager.instance == null) return false;
+        return TryRemoveItemFromArray(InventoryManager.instance.inventories, InventoryManager.instance.LoadInventory);
     }
 
     public virtual void RemoveItem()
@@ -155,8 +157,7 @@ public class Item : MonoBehaviour
                 }
             }
         }
-
-        Hotbar.instance.LoadHotbar();
+        HotbarManager.instance.LoadHotbar();
     }
 }
 

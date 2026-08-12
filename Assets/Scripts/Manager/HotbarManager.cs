@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-public class Hotbar : MonoBehaviour
+public class HotbarManager : MonoBehaviour
 {
-    public static Hotbar instance;
+    public static HotbarManager instance;
     public Item[] inventories = new Item[6];
     public Transform hotbarDisplay;
     private Sprite blankItem;

@@ -10,7 +10,11 @@ public enum FoodType
 public class Food : Item
 {
     public FoodType foodType;
-
+    protected override void Awake()
+    {
+        base.Awake();
+        ItemType = ItemType.food;
+    }
 
     public override void UseItem()
     {
@@ -22,8 +26,8 @@ public class Food : Item
                 break;
         }
         RemoveItem();
-        Inventory.instance.LoadInventory();
-        Hotbar.instance.LoadHotbar();
+        InventoryManager.instance.LoadInventory();
+        HotbarManager.instance.LoadHotbar();
     }
 
 }
