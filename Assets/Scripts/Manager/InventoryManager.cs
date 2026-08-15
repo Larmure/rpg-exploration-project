@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class InventoryManager : MonoBehaviour
+public class InventoryManager : MonoBehaviour, IItemContainer
 {
     public static InventoryManager instance;
     public Item[] inventories = new Item[24];
@@ -23,36 +23,43 @@ public class InventoryManager : MonoBehaviour
         inventoryDisplay.gameObject.SetActive(false);
     }
 
+    // --- IItemContainer ---
+
+    public Item GetItem(int index)
+    {
+        if (index < 0 || index >= inventories.Length) return null;
+        return inventories[index];
+    }
+
+    public void SetItem(int index, Item item)
+    {
+        if (index < 0 || index >= inventories.Length) return;
+        inventories[index] = item;
+    }
+
+    public void RefreshUI()
+    {
+        LoadInventory();
+    }
+
+    // ----------------------
+
     public void LoadInventory()
     {
         for (int i = 0; i < inventories.Length; i++)
         {
-            int index = i;
+            var icon = inventoryDisplay.transform.GetChild(i).transform.Find("Icon").GetComponent<Image>();
+            var amountText = inventoryDisplay.transform.GetChild(i).transform.Find("Amount").GetComponent<TextMeshProUGUI>();
 
             if (inventories[i] == null)
             {
-                inventoryDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "";
-                inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = blankItem;
-                inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
-                inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
-                    delegate {
-                        Debug.Log("Empty Slot");
-                        SetSlot(index);
-                    });
-
+                amountText.text = "";
+                icon.sprite = blankItem;
                 continue;
             }
 
-            inventoryDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "" + inventories[i].amount;
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = inventories[i].icon;
-
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
-                delegate {
-                    inventories[index].UseItem();
-                    SetSlot(index);
-                });
-            inventoryDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().interactable = true;
+            amountText.text = "" + inventories[i].amount;
+            icon.sprite = inventories[i].icon;
         }
     }
 
@@ -64,7 +71,7 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    private void SetSlot(int index)
+    public void SetSlot(int index)
     {
         foreach (Transform slot in inventoryDisplay)
         {

@@ -255,10 +255,12 @@ public class PlayerScript : MonoBehaviour
     {
         if (isInvincible || isDead) return;
 
-        currentHealth -= amount;
+        int mitigatedDamage = Mathf.Max(amount - armorPoints, 1);
+
+        currentHealth -= mitigatedDamage;
         currentHealth = Mathf.Max(currentHealth, 0);
 
-        Debug.Log($"Player hit! HP remaining: {currentHealth}/{maxHealth}");
+        Debug.Log($"Player hit! Damage: {mitigatedDamage} (raw {amount}, armor {armorPoints}) HP remaining: {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0)
         {

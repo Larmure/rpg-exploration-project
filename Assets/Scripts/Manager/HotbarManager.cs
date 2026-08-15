@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-public class HotbarManager : MonoBehaviour
+
+public class HotbarManager : MonoBehaviour, IItemContainer
 {
     public static HotbarManager instance;
     public Item[] inventories = new Item[6];
@@ -22,43 +23,53 @@ public class HotbarManager : MonoBehaviour
         blankItem = hotbarDisplay.transform.GetChild(0).transform.Find("Icon").GetComponent<Image>().sprite;
     }
 
+    // --- IItemContainer ---
+
+    public Item GetItem(int index)
+    {
+        if (index < 0 || index >= inventories.Length) return null;
+        return inventories[index];
+    }
+
+    public void SetItem(int index, Item item)
+    {
+        if (index < 0 || index >= inventories.Length) return;
+        inventories[index] = item;
+
+        if (index == currentHotbarIndex)
+        {
+            currentItem = item;
+        }
+    }
+
+    public void RefreshUI()
+    {
+        LoadHotbar();
+    }
+
+    // ----------------------
+
     public void LoadHotbar()
     {
         for (int i = 0; i < inventories.Length; i++)
         {
+            var icon = hotbarDisplay.transform.GetChild(i).transform.Find("Icon").GetComponent<Image>();
+            var amountText = hotbarDisplay.transform.GetChild(i).transform.Find("Amount").GetComponent<TextMeshProUGUI>();
 
-            int index = i;
-
-            if(inventories[i] == null)
+            if (inventories[i] == null)
             {
-                hotbarDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "";
-                hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = blankItem;
-                hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
-                hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
-                    delegate { 
-                        Debug.Log("Empty Slot");
-                        SetSlot(index);
-                        });
-
-                continue;   
+                amountText.text = "";
+                icon.sprite = blankItem;
+                continue;
             }
 
-            hotbarDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>().text = "" + inventories[i].amount;
-            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>().sprite = inventories[i].icon;
-
-            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.RemoveAllListeners();
-            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().onClick.AddListener(
-                delegate { 
-                        inventories[index].UseItem();
-                        SetSlot(index);
-                        });
-            hotbarDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>().interactable = true;
-
+            amountText.text = "" + inventories[i].amount;
+            icon.sprite = inventories[i].icon;
         }
         currentItem = inventories[currentHotbarIndex];
     }
 
-    private void SetSlot(int index)
+    public void SetSlot(int index)
     {
         foreach (Transform slot in hotbarDisplay)
         {

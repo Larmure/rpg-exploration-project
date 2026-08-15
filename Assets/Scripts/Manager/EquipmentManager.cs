@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class EquipmentManager : MonoBehaviour
+public class EquipmentManager : MonoBehaviour, IItemContainer
 {
     public static EquipmentManager instance;
     public Item[] equipments = new Item[3];
@@ -23,35 +23,43 @@ public class EquipmentManager : MonoBehaviour
         equipmentDisplay.gameObject.SetActive(false);
     }
 
+    // --- IItemContainer ---
+
+    public Item GetItem(int index)
+    {
+        if (index < 0 || index >= equipments.Length) return null;
+        return equipments[index];
+    }
+
+    public void SetItem(int index, Item item)
+    {
+        if (index < 0 || index >= equipments.Length) return;
+        equipments[index] = item;
+    }
+
+    public void RefreshUI()
+    {
+        LoadEquipment();
+    }
+
+    // ----------------------
+
     public void LoadEquipment()
     {
         for (int i = 0; i < equipments.Length; i++)
         {
-            int index = i;
-
-            var icon = equipmentDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Image>();
-            var button = equipmentDisplay.transform.GetChild(index).transform.Find("Icon").GetComponent<Button>();
-            var amountText = equipmentDisplay.transform.GetChild(index).transform.Find("Amount").GetComponent<TextMeshProUGUI>();
-
-            button.onClick.RemoveAllListeners();
+            var icon = equipmentDisplay.transform.GetChild(i).transform.Find("Icon").GetComponent<Image>();
+            var amountText = equipmentDisplay.transform.GetChild(i).transform.Find("Amount").GetComponent<TextMeshProUGUI>();
 
             if (equipments[i] == null)
             {
                 amountText.text = "";
                 icon.sprite = blankItem;
-                button.interactable = false;
-
                 continue;
             }
 
             amountText.text = "" + equipments[i].amount;
             icon.sprite = equipments[i].icon;
-
-            button.interactable = true;
-            button.onClick.AddListener(delegate
-            {
-                (equipments[index] as EquipmentItem)?.UnequipItem();
-            });
         }
     }
 

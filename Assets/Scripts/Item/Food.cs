@@ -22,10 +22,15 @@ public class Food : Item
         switch (foodType)
         {
             case FoodType.health:
-                PlayerScript.instance.currentHealth += amount;
+                {
+                    if(PlayerScript.instance.currentHealth + amount <= PlayerScript.instance.maxHealth)
+                    {
+                        PlayerScript.instance.currentHealth += amount;
+                        RemoveItem();
+                    }
+                }
                 break;
         }
-        RemoveItem();
         InventoryManager.instance.LoadInventory();
         HotbarManager.instance.LoadHotbar();
     }
