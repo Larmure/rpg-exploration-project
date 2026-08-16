@@ -62,7 +62,10 @@ public class ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         dragImage.raycastTarget = false;
 
         RectTransform dragRect = dragIconObject.GetComponent<RectTransform>();
-        dragRect.sizeDelta = ((RectTransform)icon.transform).sizeDelta;
+        dragRect.anchorMin = new Vector2(0.5f, 0.5f);
+        dragRect.anchorMax = new Vector2(0.5f, 0.5f);
+        dragRect.pivot = new Vector2(0.5f, 0.5f);
+        dragRect.sizeDelta = ((RectTransform)icon.transform).rect.size;
 
         CanvasGroup cg = dragIconObject.AddComponent<CanvasGroup>();
         cg.blocksRaycasts = false;
@@ -75,7 +78,16 @@ public class ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     {
         if (dragIconObject != null)
         {
-            dragIconObject.transform.position = eventData.position;
+            RectTransform canvasRect = (RectTransform)rootCanvas.transform;
+            Camera cam = rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : rootCanvas.worldCamera;
+
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect, eventData.position, cam, out Vector2 localPoint))
+            {
+                dragIconObject.GetComponent<RectTransform>().anchoredPosition = localPoint;
+            }
         }
     }
 
@@ -110,9 +122,30 @@ public class ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
         Item targetItem = targetContainer.GetItem(slotIndex);
 
+        bool sourceWasEquipped = sourceSlot.containerType == ContainerType.Equipment;
+        bool sourceWillBeEquipped = containerType == ContainerType.Equipment;
+
         // Échange des deux objets entre les deux conteneurs (peut être le même)
         sourceContainer.SetItem(sourceSlot.slotIndex, targetItem);
         targetContainer.SetItem(slotIndex, sourceItem);
+
+        // sourceItem change d'état d'équipement ?
+        if (sourceWasEquipped && !sourceWillBeEquipped)
+            (sourceItem as EquipmentItem)?.NotifyUnequipped();
+        else if (!sourceWasEquipped && sourceWillBeEquipped)
+            (sourceItem as EquipmentItem)?.NotifyEquipped();
+
+        // targetItem (qui part dans l'autre sens) change d'état aussi ?
+        if (targetItem != null)
+        {
+            bool targetWasEquipped = containerType == ContainerType.Equipment;
+            bool targetWillBeEquipped = sourceSlot.containerType == ContainerType.Equipment;
+
+            if (targetWasEquipped && !targetWillBeEquipped)
+                (targetItem as EquipmentItem)?.NotifyUnequipped();
+            else if (!targetWasEquipped && targetWillBeEquipped)
+                (targetItem as EquipmentItem)?.NotifyEquipped();
+        }
 
         sourceContainer.RefreshUI();
         targetContainer.RefreshUI();

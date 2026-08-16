@@ -25,7 +25,7 @@ public class Food : Item
                 {
                     if(PlayerScript.instance.currentHealth + amount <= PlayerScript.instance.maxHealth)
                     {
-                        PlayerScript.instance.currentHealth += amount;
+                        PlayerScript.instance.Heal(amount);
                         RemoveItem();
                     }
                 }

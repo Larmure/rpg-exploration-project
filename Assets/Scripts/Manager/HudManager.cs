@@ -17,7 +17,7 @@ public class HudManager : MonoBehaviour
 
     private void Update()
     {
-        healthText.text = $"HP {PlayerScript.instance.currentHealth}/{PlayerScript.instance.maxHealth}";
+        healthText.text = $"{PlayerScript.instance.currentHealth}/{PlayerScript.instance.maxHealth}";
         armorText.text = $"Armor {PlayerScript.instance.armorPoints}";  
     }
 }

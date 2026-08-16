@@ -88,6 +88,9 @@ public class EquipmentItem : Item
         }
     }
 
+    public void NotifyEquipped() => OnEquipped();
+    public void NotifyUnequipped() => OnUnequipped();
+
     protected virtual void OnEquipped() { }
     protected virtual void OnUnequipped() { }
 }

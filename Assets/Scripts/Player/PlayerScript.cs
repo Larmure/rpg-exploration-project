@@ -45,6 +45,10 @@ public class PlayerScript : MonoBehaviour
     private Camera mainCamera;
     private SpriteRenderer spriteRenderer;
 
+    [Header("UI")]
+    public HealthBar healthBar;
+    //public ManaBar manaBar;
+
     private void Awake()
     {
         if (instance == null)
@@ -63,6 +67,7 @@ public class PlayerScript : MonoBehaviour
         animator = GetComponent<Animator>();
         mainCamera = Camera.main;
         spriteRenderer = GetComponent<SpriteRenderer>();
+        healthBar.SetMaxHealth(maxHealth);
     }
 
     void Update()
@@ -259,6 +264,7 @@ public class PlayerScript : MonoBehaviour
 
         currentHealth -= mitigatedDamage;
         currentHealth = Mathf.Max(currentHealth, 0);
+        healthBar.SetHealth(currentHealth);
 
         Debug.Log($"Player hit! Damage: {mitigatedDamage} (raw {amount}, armor {armorPoints}) HP remaining: {currentHealth}/{maxHealth}");
 
@@ -276,6 +282,7 @@ public class PlayerScript : MonoBehaviour
     {
         currentHealth += amount;
         currentHealth = Mathf.Min(currentHealth, maxHealth);
+        healthBar.SetHealth(currentHealth);
     }
 
     private System.Collections.IEnumerator InvincibilityFrames()
