@@ -23,6 +23,9 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private float weaponKnockbackForce = 6f; 
     [SerializeField] private float weaponKnockbackDuration = 0.15f; 
+
+    [Header("Currency")]
+    [SerializeField] public int gold = 0;
     
 
     [Header("Knockback")]
@@ -346,5 +349,12 @@ public class PlayerScript : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPos, attackRadius);
+    }
+
+    public void AddGold(int amount)
+    {
+        gold += amount;
+        Debug.Log($"Gold: +{amount} (total: {gold})");
+        // TODO: si tu as un HUD pour l'or, appelle-le ici, ex: goldText.text = gold.ToString();
     }
 }

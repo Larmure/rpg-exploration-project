@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public enum ItemType
 {
-    food, armor
+    food, armor, coin
 }
 
 public class Item : MonoBehaviour
