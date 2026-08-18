@@ -7366,7 +7366,7 @@ GameObject:
   - component: {fileID: 921798335}
   - component: {fileID: 921798336}
   - component: {fileID: 921798337}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: DetectionZone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
