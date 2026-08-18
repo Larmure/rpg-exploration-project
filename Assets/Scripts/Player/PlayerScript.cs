@@ -24,6 +24,11 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float weaponKnockbackForce = 6f; 
     [SerializeField] private float weaponKnockbackDuration = 0.15f; 
 
+    [Header("Magic")]
+    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private int spellDamage = 15;
+    [SerializeField] private float projectileSpawnOffset = 1.0f;
+
     [Header("Currency")]
     [SerializeField] public int gold = 0;
     
@@ -39,6 +44,7 @@ public class PlayerScript : MonoBehaviour
     private Vector2 moveInput;
     private bool isInvincible = false;
     private bool isAttacking = false;
+    private bool isCasting = false;
     private float attackCooldownTimer = 0f;
 
     private float lastMoveX = 0f;
@@ -96,12 +102,19 @@ public class PlayerScript : MonoBehaviour
 
         moveInput = new Vector2(horizontal, vertical).normalized;
 
-        bool attackPressed = Input.GetKeyDown(KeyCode.Space) 
-            || (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject());
+        bool attackPressed =  
+            Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject();
+
+        bool castPressed = Input.GetKeyDown(KeyCode.Space);
 
         if (attackPressed && !isAttacking && attackCooldownTimer <= 0f)
         {
             Attack();
+        }
+
+        if (castPressed && !isCasting && !isAttacking)
+        {
+            Cast();
         }
 
         bool usePressed = Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject(); 
@@ -162,6 +175,32 @@ public class PlayerScript : MonoBehaviour
         Invoke(nameof(DealDamage), attackDuration * 0.5f);
     }
 
+    private void Cast()
+    {
+        animator.SetBool("IsCasting", true);
+        isCasting = true;
+        moveInput = Vector2.zero;
+        attackCooldownTimer = attackCooldown;
+
+        attackDirection = GetMouseDirection();
+        lastMoveX = attackDirection.x;
+        lastMoveY = attackDirection.y;
+
+        animator.SetTrigger("Cast");
+        animator.SetBool("IsCasting", true);
+
+        Invoke(nameof(SpawnProjectile), attackDuration * 0.5f);
+    }
+
+    private void SpawnProjectile()
+    {
+        if (projectilePrefab == null) return;
+
+        Vector2 spawnPos = (Vector2)transform.position + attackDirection * projectileSpawnOffset;
+        GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
+        proj.GetComponent<Projectile>().Init(attackDirection, spellDamage, enemyLayer);
+    }
+
     private void DealDamage()
     {
         Vector2 attackPos = (Vector2)transform.position + attackDirection * attackDistance;
@@ -184,6 +223,12 @@ public class PlayerScript : MonoBehaviour
     {
         isAttacking = false;
         animator.SetBool("IsAttacking", false);
+    }
+
+    public void EndCast()
+    {
+        isCasting = false;
+        animator.SetBool("IsCasting", false);
     }
 
     void FixedUpdate()
@@ -216,7 +261,7 @@ public class PlayerScript : MonoBehaviour
 
         bool isMoving = moveInput.sqrMagnitude > 0.01f;
 
-        if (isAttacking)
+        if (isAttacking || isCasting)
         {
             Vector2 dir = attackDirection;
             if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
