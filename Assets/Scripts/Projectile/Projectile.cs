@@ -9,6 +9,11 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float knockbackDuration = 0.15f;
     [SerializeField] private bool destroyOnHit = true;
 
+    [Header("Hit Effect")]
+    [SerializeField] private GameObject hitEffectPrefab;
+    [SerializeField] private float hitEffectLifetime = 1f;
+    [SerializeField] private bool orientEffectToNormal = true;
+
     private Vector2 direction;
     private LayerMask enemyLayer;
 
@@ -40,8 +45,28 @@ public class Projectile : MonoBehaviour
             enemy.ApplyKnockback(knockDir, knockbackForce, knockbackDuration);
             enemy.TakeDamage(damage);
 
+            SpawnHitEffect(other);
+
             if (destroyOnHit)
                 Destroy(gameObject);
         }
+    }
+
+    private void SpawnHitEffect(Collider2D other)
+    {
+        if (hitEffectPrefab == null) return;
+
+        Vector2 hitPoint = other.ClosestPoint(transform.position);
+
+        Quaternion effectRotation = transform.rotation;
+
+        if (orientEffectToNormal)
+        {
+            float angle = Mathf.Atan2(-direction.y, -direction.x) * Mathf.Rad2Deg;
+            effectRotation = Quaternion.Euler(0f, 0f, angle);
+        }
+
+        GameObject fx = Instantiate(hitEffectPrefab, hitPoint, effectRotation);
+        Destroy(fx, hitEffectLifetime);
     }
 }
