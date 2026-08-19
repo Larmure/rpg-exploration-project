@@ -58,6 +58,10 @@ public class PlayerScript : MonoBehaviour
     public HealthBar healthBar;
     //public ManaBar manaBar;
 
+    [Header("Interaction")]
+    [SerializeField] private float interactionRange = 1.5f;
+    [SerializeField] private LayerMask interactableLayer;
+
     private void Awake()
     {
         if (instance == null)
@@ -92,6 +96,12 @@ public class PlayerScript : MonoBehaviour
 
     private void HandleInput()
     {
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive())
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
         float horizontal = 0f;
         float vertical = 0f;
 
@@ -102,15 +112,20 @@ public class PlayerScript : MonoBehaviour
 
         moveInput = new Vector2(horizontal, vertical).normalized;
 
-        bool attackPressed =  
-            Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject();
+        bool leftClick = Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject();
+
+        if (leftClick)
+        {
+            if (!TryInteract())
+            {
+                if (!isAttacking && attackCooldownTimer <= 0f)
+                {
+                    Attack();
+                }
+            }
+        }
 
         bool castPressed = Input.GetKeyDown(KeyCode.Space);
-
-        if (attackPressed && !isAttacking && attackCooldownTimer <= 0f)
-        {
-            Attack();
-        }
 
         if (castPressed && !isCasting && !isAttacking)
         {
@@ -123,7 +138,32 @@ public class PlayerScript : MonoBehaviour
         {
             UseCurrentItem();
         }
+    }
 
+    private bool TryInteract()
+    {
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = -mainCamera.transform.position.z;
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreenPos);
+
+        Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, interactableLayer);
+
+        Debug.Log($"[TryInteract] mouseWorldPos={mouseWorldPos}, hit={(hit != null ? hit.name : "null")}");
+
+        if (hit == null) return false;
+
+        IInteractable interactable = hit.GetComponent<IInteractable>();
+        Debug.Log($"[TryInteract] interactable={(interactable != null ? "found" : "null")}");
+
+        if (interactable == null) return false;
+
+        float distance = Vector2.Distance(transform.position, hit.transform.position);
+        Debug.Log($"[TryInteract] distance={distance}, range={interactionRange}");
+
+        if (distance > interactionRange) return false;
+
+        interactable.Interact();
+        return true;
     }
 
     private void UseCurrentItem()
