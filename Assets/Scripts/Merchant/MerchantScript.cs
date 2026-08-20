@@ -7,20 +7,40 @@ public class Merchant : MonoBehaviour, IInteractable
     [Header("Dialogue")]
     [SerializeField] private string[] dialogueLines = new string[]
     {
-        "Hey Pal!", 
+        "Hey Pal!",
         "Need something ?"
     };
+
+    [Header("Shop")]
+    [Tooltip("Les items que ce marchand vend (prefabs d'Item).")]
+    public Item[] itemsForSale;
 
     public void Interact()
     {
         Debug.Log("Interaction avec le marchand !");
-        DialogueManager.Instance.StartDialogue(merchantName, dialogueLines);
+        DialogueManager.Instance.StartDialogue(
+            merchantName,
+            dialogueLines,
+            new string[] { "Buy", "Sell" },
+            OnMerchantChoice
+        );
+    }
 
-        // TODO: remplace par ton système de dialogue quand il existera
-        // Exemple si tu as un DialogueManager :
-        // DialogueManager.Instance.StartDialogue(dialogueLines);
+    private void OnMerchantChoice(int choiceIndex)
+    {
+        if (ShopManager.instance == null)
+        {
+            Debug.LogError("[Merchant] ShopManager introuvable dans la scène.");
+            return;
+        }
 
-        // TODO: ici tu pourras plus tard ouvrir l'UI du shop
-        // ShopUI.Instance.Open();
+        if (choiceIndex == 0)
+        {
+            ShopManager.instance.OpenBuyMenu(this);
+        }
+        else
+        {
+            ShopManager.instance.OpenSellMenu();
+        }
     }
 }
