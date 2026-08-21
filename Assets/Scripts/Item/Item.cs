@@ -16,6 +16,7 @@ public class Item : MonoBehaviour
     public string nameItem;
     public int amount;
     public bool isUsed;
+    public int price;
 
     protected virtual void Awake() { }
 
