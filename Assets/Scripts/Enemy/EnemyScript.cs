@@ -36,7 +36,7 @@ public class EnemyScript : MonoBehaviour
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0);
 
-        Debug.Log($"{gameObject.name} hit ! HP remaining : {currentHealth}/{maxHealth}");
+        // Debug.Log($"{gameObject.name} hit ! HP remaining : {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0)
         {
@@ -130,6 +130,7 @@ public class EnemyScript : MonoBehaviour
                 playerScript.TakeDamage(attackDamage);
             }
         }
+
     }
 
     public void ApplyKnockback(Vector2 direction, float force, float duration)

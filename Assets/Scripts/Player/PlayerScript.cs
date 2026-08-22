@@ -14,6 +14,10 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float blinkInterval = 0.005f;
     [SerializeField] private float moveSpeed = 5f;
 
+    [SerializeField] public int maxMana = 100;
+    [SerializeField] public int currentMana = 100;
+
+
     [Header("Attack")]
     [SerializeField] private float attackDuration = 0.4f;
     [SerializeField] private float attackCooldown = 0.2f;
@@ -28,6 +32,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private int spellDamage = 15;
     [SerializeField] private float projectileSpawnOffset = 1.0f;
+    [SerializeField] private int manaCost = 10; // temporaire
 
     [Header("Currency")]
     [SerializeField] public int gold = 0;
@@ -55,8 +60,8 @@ public class PlayerScript : MonoBehaviour
     private SpriteRenderer spriteRenderer;
 
     [Header("UI")]
-    public HealthBar healthBar;
-    //public ManaBar manaBar;
+    public Bar healthBar;
+    public Bar manaBar;
 
     [Header("Interaction")]
     [SerializeField] private float interactionRange = 1.5f;
@@ -80,7 +85,8 @@ public class PlayerScript : MonoBehaviour
         animator = GetComponent<Animator>();
         mainCamera = Camera.main;
         spriteRenderer = GetComponent<SpriteRenderer>();
-        healthBar.SetMaxHealth(maxHealth);
+        healthBar.SetMaxValue(maxHealth);
+        manaBar.SetMaxValue(maxMana);
     }
 
     void Update()
@@ -118,7 +124,7 @@ public class PlayerScript : MonoBehaviour
         {
             if (!TryInteract())
             {
-                if (!isAttacking && attackCooldownTimer <= 0f)
+                if (!isAttacking && attackCooldownTimer <= 0f && !isCasting)
                 {
                     Attack();
                 }
@@ -148,17 +154,17 @@ public class PlayerScript : MonoBehaviour
 
         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, interactableLayer);
 
-        Debug.Log($"[TryInteract] mouseWorldPos={mouseWorldPos}, hit={(hit != null ? hit.name : "null")}");
+        // Debug.Log($"[TryInteract] mouseWorldPos={mouseWorldPos}, hit={(hit != null ? hit.name : "null")}");
 
         if (hit == null) return false;
 
         IInteractable interactable = hit.GetComponent<IInteractable>();
-        Debug.Log($"[TryInteract] interactable={(interactable != null ? "found" : "null")}");
+        // Debug.Log($"[TryInteract] interactable={(interactable != null ? "found" : "null")}");
 
         if (interactable == null) return false;
 
         float distance = Vector2.Distance(transform.position, hit.transform.position);
-        Debug.Log($"[TryInteract] distance={distance}, range={interactionRange}");
+        // Debug.Log($"[TryInteract] distance={distance}, range={interactionRange}");
 
         if (distance > interactionRange) return false;
 
@@ -229,6 +235,15 @@ public class PlayerScript : MonoBehaviour
         animator.SetTrigger("Cast");
         animator.SetBool("IsCasting", true);
 
+        if (currentMana < manaCost)
+        {         
+            EndCast();
+            return;
+        }
+
+        currentMana -= manaCost;
+        manaBar.SetValue(currentMana);
+
         Invoke(nameof(SpawnProjectile), attackDuration * 0.5f);
     }
 
@@ -243,6 +258,8 @@ public class PlayerScript : MonoBehaviour
 
     private void DealDamage()
     {
+        bool enemyHit = false;
+
         Vector2 attackPos = (Vector2)transform.position + attackDirection * attackDistance;
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, attackRadius, enemyLayer);
@@ -255,7 +272,14 @@ public class PlayerScript : MonoBehaviour
                 Vector2 knockDir = (enemy.transform.position - transform.position).normalized;
                 enemy.ApplyKnockback(knockDir, weaponKnockbackForce, weaponKnockbackDuration);
                 enemy.TakeDamage(attackDamage);
+                enemyHit = true;
             }
+        }
+
+        if (enemyHit)
+        {
+            currentMana += 5;
+            manaBar.SetValue(currentMana);
         }
     }
 
@@ -352,9 +376,9 @@ public class PlayerScript : MonoBehaviour
 
         currentHealth -= mitigatedDamage;
         currentHealth = Mathf.Max(currentHealth, 0);
-        healthBar.SetHealth(currentHealth);
+        healthBar.SetValue(currentHealth);
 
-        Debug.Log($"Player hit! Damage: {mitigatedDamage} (raw {amount}, armor {armorPoints}) HP remaining: {currentHealth}/{maxHealth}");
+        // Debug.Log($"Player hit! Damage: {mitigatedDamage} (raw {amount}, armor {armorPoints}) HP remaining: {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0)
         {
@@ -370,7 +394,7 @@ public class PlayerScript : MonoBehaviour
     {
         currentHealth += amount;
         currentHealth = Mathf.Min(currentHealth, maxHealth);
-        healthBar.SetHealth(currentHealth);
+        healthBar.SetValue(currentHealth);
     }
 
     private System.Collections.IEnumerator InvincibilityFrames()
