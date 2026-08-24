@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 6894808204459458087}
   - component: {fileID: 436507785238513356}
   - component: {fileID: 4423380743620108500}
-  - component: {fileID: 6482120782047740053}
   - component: {fileID: 6562863348310985403}
+  - component: {fileID: 7987184395902442481}
   m_Layer: 8
-  m_Name: ProjectileTest
+  m_Name: Firebolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 6805757836054298244}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -16.74, y: -1.83, z: 0}
+  m_LocalPosition: {x: -0.76441, y: -0.81683, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -159,27 +159,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &6482120782047740053
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6805757836054298244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a791bd5ad9774ed47a36414ea5d551ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  speed: 15
-  lifetime: 3
-  damage: 15
-  knockbackForce: 10
-  knockbackDuration: 0.33
-  destroyOnHit: 1
-  hitEffectPrefab: {fileID: 63899707902455818, guid: 83ac9f4433bafc9459c13790aae044a4, type: 3}
-  hitEffectLifetime: 0.25
-  orientEffectToNormal: 1
 --- !u!95 &6562863348310985403
 Animator:
   serializedVersion: 7
@@ -202,3 +181,16 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7987184395902442481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6805757836054298244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ed3cf5e11324e34c80ee34a029d7964, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Firebolt
+  data: {fileID: 11400000, guid: 4ffa96ea4075f45478bd86efc35d8456, type: 2}

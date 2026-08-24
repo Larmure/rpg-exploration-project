@@ -1175,6 +1175,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2473812041546518263, guid: 6d1fcc26c8637c14194f8edb0879be3c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2569400080145187105, guid: 6d1fcc26c8637c14194f8edb0879be3c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2727,6 +2731,10 @@ PrefabInstance:
       propertyPath: currentMana
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 7365835383999993021, guid: 00adc86e7e8d63f4d8cf7355319e635c, type: 3}
+      propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 6805757836054298244, guid: 61835a04e1fe4844996f4028360efd1e, type: 3}
     - target: {fileID: 8108333112362107517, guid: 00adc86e7e8d63f4d8cf7355319e635c, type: 3}
       propertyPath: m_Name
       value: Player

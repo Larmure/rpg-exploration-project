@@ -30,9 +30,7 @@ public class PlayerScript : MonoBehaviour
 
     [Header("Magic")]
     [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private int spellDamage = 15;
     [SerializeField] private float projectileSpawnOffset = 1.0f;
-    [SerializeField] private int manaCost = 10; // temporaire
 
     [Header("Currency")]
     [SerializeField] public int gold = 0;
@@ -235,6 +233,8 @@ public class PlayerScript : MonoBehaviour
         animator.SetTrigger("Cast");
         animator.SetBool("IsCasting", true);
 
+        int manaCost = projectilePrefab.GetComponent<Projectile>().ManaCost;
+
         if (currentMana < manaCost)
         {         
             EndCast();
@@ -253,7 +253,7 @@ public class PlayerScript : MonoBehaviour
 
         Vector2 spawnPos = (Vector2)transform.position + attackDirection * projectileSpawnOffset;
         GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
-        proj.GetComponent<Projectile>().Init(attackDirection, spellDamage, enemyLayer);
+        proj.GetComponent<Projectile>().Init(attackDirection, enemyLayer);
     }
 
     private void DealDamage()

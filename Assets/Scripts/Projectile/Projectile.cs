@@ -1,37 +1,26 @@
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+public abstract class Projectile : MonoBehaviour
 {
-    [SerializeField] private float speed = 20f;
-    [SerializeField] private float lifetime = 3f;
-    [SerializeField] private int damage = 15;
-    [SerializeField] private float knockbackForce = 6f;
-    [SerializeField] private float knockbackDuration = 0.15f;
-    [SerializeField] private bool destroyOnHit = true;
+    [SerializeField] protected SpellData data;
 
-    [Header("Hit Effect")]
-    [SerializeField] private GameObject hitEffectPrefab;
-    [SerializeField] private float hitEffectLifetime = 1f;
-    [SerializeField] private bool orientEffectToNormal = true;
+    public int ManaCost => data.manaCost;
 
-    private Vector2 direction;
-    private LayerMask enemyLayer;
+    protected Vector2 direction;
+    protected LayerMask enemyLayer;
 
-    public void Init(Vector2 dir, int dmg, LayerMask layer)
+    public virtual void Init(Vector2 dir, LayerMask layer)
     {
         direction = dir.normalized;
-        damage = dmg;
         enemyLayer = layer;
 
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
-
-        Destroy(gameObject, lifetime);
+        RotateTowardsDirection();
+        Destroy(gameObject, data.lifetime);
     }
 
-    void Update()
+    protected virtual void Update()
     {
-        transform.position += (Vector3)(direction * speed * Time.deltaTime);
+        transform.position += (Vector3)(direction * data.speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -39,34 +28,28 @@ public class Projectile : MonoBehaviour
         if (((1 << other.gameObject.layer) & enemyLayer) == 0) return;
 
         EnemyScript enemy = other.GetComponentInParent<EnemyScript>();
-        if (enemy != null)
-        {
-            Vector2 knockDir = (enemy.transform.position - transform.position).normalized;
-            enemy.ApplyKnockback(knockDir, knockbackForce, knockbackDuration);
-            enemy.TakeDamage(damage);
+        if (enemy == null) return;
 
-            SpawnHitEffect(other);
+        enemy.TakeDamage(data.damage);
+        OnHitEnemy(enemy, other);
+        SpawnHitEffect(other);
 
-            if (destroyOnHit)
-                Destroy(gameObject);
-        }
+        Destroy(gameObject);
     }
 
-    private void SpawnHitEffect(Collider2D other)
+    protected abstract void OnHitEnemy(EnemyScript enemy, Collider2D other);
+
+    protected virtual void SpawnHitEffect(Collider2D other)
     {
-        if (hitEffectPrefab == null) return;
-
+        if (data.hitEffectPrefab == null) return;
         Vector2 hitPoint = other.ClosestPoint(transform.position);
+        GameObject fx = Instantiate(data.hitEffectPrefab, hitPoint, transform.rotation);
+        Destroy(fx, data.hitEffectLifetime);
+    }
 
-        Quaternion effectRotation = transform.rotation;
-
-        if (orientEffectToNormal)
-        {
-            float angle = Mathf.Atan2(-direction.y, -direction.x) * Mathf.Rad2Deg;
-            effectRotation = Quaternion.Euler(0f, 0f, angle);
-        }
-
-        GameObject fx = Instantiate(hitEffectPrefab, hitPoint, effectRotation);
-        Destroy(fx, hitEffectLifetime);
+    protected virtual void RotateTowardsDirection()
+    {
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 }
