@@ -46,6 +46,12 @@ public class ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (ShopManager.instance != null && ShopManager.instance.IsShopOpen)
+        {
+            eventData.pointerDrag = null;
+            return;
+        }
+
         Item item = Container?.GetItem(slotIndex);
         if (item == null)
         {
@@ -155,6 +161,12 @@ public class ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     {
         Item item = Container?.GetItem(slotIndex);
         if (item == null) return;
+
+        if (ShopManager.instance != null && ShopManager.instance.IsShopOpen)
+        {
+            ShopManager.instance.SellItem(Container, slotIndex, containerType);
+            return;
+        }
 
         if (containerType == ContainerType.Equipment)
         {

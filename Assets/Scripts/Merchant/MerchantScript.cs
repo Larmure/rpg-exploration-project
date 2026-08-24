@@ -17,16 +17,16 @@ public class Merchant : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        Debug.Log("Interaction avec le marchand !");
         DialogueManager.Instance.StartDialogue(
             merchantName,
             dialogueLines,
-            new string[] { "Buy", "Sell" },
-            OnMerchantChoice
+            null,
+            null,
+            OpenShop
         );
     }
 
-    private void OnMerchantChoice(int choiceIndex)
+    private void OpenShop()
     {
         if (ShopManager.instance == null)
         {
@@ -34,13 +34,6 @@ public class Merchant : MonoBehaviour, IInteractable
             return;
         }
 
-        if (choiceIndex == 0)
-        {
-            ShopManager.instance.OpenBuyMenu(this);
-        }
-        else
-        {
-            ShopManager.instance.OpenSellMenu();
-        }
+        ShopManager.instance.OpenShop(this);
     }
 }

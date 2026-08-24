@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Reflection;
 
 public class ShopManager : MonoBehaviour
 {
     public static ShopManager instance;
-
-    private enum ShopMode { Buy, Sell }
 
     [Header("UI References (même style que l'inventaire)")]
     public GameObject shopPanel;
@@ -14,9 +13,9 @@ public class ShopManager : MonoBehaviour
 
     private Sprite blankItem;
     private ShopSlotUI[] slotUIs;
-
-    private ShopMode currentMode;
     private Merchant currentMerchant;
+
+    public bool IsShopOpen => shopPanel != null && shopPanel.activeSelf;
 
     private void Awake()
     {
@@ -45,37 +44,30 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    // ---------------- OUVERTURE ----------------
+    // ---------------- OUVERTURE / FERMETURE ----------------
 
     [Header("UI à masquer pendant le shop")]
-    public GameObject inventoryUI; // à assigner: l'objet "Inventory" ou son parent
+    public GameObject inventoryUI;
+    public GameObject equipmentUI;
 
-    public void OpenBuyMenu(Merchant merchant)
+    public void OpenShop(Merchant merchant)
     {
-        currentMode = ShopMode.Buy;
         currentMerchant = merchant;
         shopPanel.SetActive(true);
-        if (inventoryUI != null) inventoryUI.SetActive(false);
+        if (inventoryUI != null) inventoryUI.SetActive(true);
+        if (equipmentUI != null) equipmentUI.SetActive(true);
         LoadBuyMenu();
-    }
-
-    public void OpenSellMenu()
-    {
-        currentMode = ShopMode.Sell;
-        currentMerchant = null;
-        shopPanel.SetActive(true);
-        if (inventoryUI != null) inventoryUI.SetActive(false);
-        LoadSellMenu();
     }
 
     public void CloseShop()
     {
         shopPanel.SetActive(false);
-        if (inventoryUI != null) inventoryUI.SetActive(true);
+        if (inventoryUI != null) inventoryUI.SetActive(false);
+        if (equipmentUI != null) equipmentUI.SetActive(false);
         currentMerchant = null;
     }
 
-    // ---------------- AFFICHAGE DES SLOTS ----------------
+    // ---------------- AFFICHAGE DU SHOP (ACHAT) ----------------
 
     private void LoadBuyMenu()
     {
@@ -98,30 +90,7 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    private void LoadSellMenu()
-    {
-        Item[] inventory = InventoryManager.instance.inventories;
-
-        for (int i = 0; i < shopDisplay.childCount; i++)
-        {
-            var icon = shopDisplay.GetChild(i).Find("Icon").GetComponent<Image>();
-            var amountText = shopDisplay.GetChild(i).Find("Amount").GetComponent<TextMeshProUGUI>();
-
-            Item item = i < inventory.Length ? inventory[i] : null;
-
-            if (item == null)
-            {
-                icon.sprite = blankItem;
-                amountText.text = "";
-                continue;
-            }
-
-            icon.sprite = item.icon;
-            amountText.text = "" + item.amount;
-        }
-    }
-
-    // ---------------- SURVOL (PRIX) ----------------
+    // ---------------- SURVOL (PRIX D'ACHAT) ----------------
 
     public void ShowPriceForSlot(int index)
     {
@@ -130,10 +99,7 @@ public class ShopManager : MonoBehaviour
         Item item = GetItemForSlot(index);
         if (item == null) return;
 
-        int price = GetPriceForSlot(index);
-        Color color = currentMode == ShopMode.Sell ? Color.red : Color.white;
-
-        slotUIs[index].ShowPrice(price.ToString(), color);
+        slotUIs[index].ShowPrice(item.price.ToString(), Color.white);
     }
 
     public void HidePriceForSlot(int index)
@@ -144,44 +110,15 @@ public class ShopManager : MonoBehaviour
 
     private Item GetItemForSlot(int index)
     {
-        if (currentMode == ShopMode.Buy)
-        {
-            if (currentMerchant == null || index >= currentMerchant.itemsForSale.Length) return null;
-            return currentMerchant.itemsForSale[index];
-        }
-        else
-        {
-            if (index >= InventoryManager.instance.inventories.Length) return null;
-            return InventoryManager.instance.GetItem(index);
-        }
+        if (currentMerchant == null || index >= currentMerchant.itemsForSale.Length) return null;
+        return currentMerchant.itemsForSale[index];
     }
 
-    private int GetPriceForSlot(int index)
-    {
-        Item item = GetItemForSlot(index);
-        if (item == null) return 0;
-
-        return currentMode == ShopMode.Buy ? item.price : GetSellPrice(item);
-    }
-
-    private int GetSellPrice(Item item)
-    {
-        // Prix de revente = moitié du prix d'achat, arrondi, minimum 1.
-        return Mathf.Max(1, Mathf.RoundToInt(item.price * 0.5f));
-    }
-
-    // ---------------- CLIC (ACHAT / VENTE) ----------------
+    // ---------------- CLIC SUR LE SHOP = ACHAT ----------------
 
     public void OnSlotClicked(int index)
     {
-        if (currentMode == ShopMode.Buy)
-        {
-            BuyItem(index);
-        }
-        else
-        {
-            SellItem(index);
-        }
+        BuyItem(index);
     }
 
     private void BuyItem(int index)
@@ -192,7 +129,7 @@ public class ShopManager : MonoBehaviour
         Item template = currentMerchant.itemsForSale[index];
         if (template == null) return;
 
-        if (Player.instance.gold < template.price)
+        if (GetGold() < template.price)
         {
             Debug.Log("Pas assez d'or !");
             return;
@@ -218,13 +155,20 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        Player.instance.gold -= template.price;
+        SetGold(GetGold() - template.price);
+        // Retire l'item du stock du marchand (achat unique par slot)
+        currentMerchant.itemsForSale[index] = null;
         LoadBuyMenu();
+
     }
 
-    private void SellItem(int index)
+    // ---------------- CLIC SUR HOTBAR / INVENTORY / EQUIPMENT = VENTE ----------------
+
+    public void SellItem(IItemContainer container, int slotIndex, ContainerType containerType)
     {
-        Item item = InventoryManager.instance.GetItem(index);
+        if (container == null) return;
+
+        Item item = container.GetItem(slotIndex);
         if (item == null) return;
 
         if (item.ItemType == ItemType.coin)
@@ -233,13 +177,47 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
+        if (containerType == ContainerType.Equipment)
+            (item as EquipmentItem)?.NotifyUnequipped();
+
         int sellPrice = GetSellPrice(item);
-        Player.instance.gold += sellPrice;
+        SetGold(GetGold() + sellPrice);
 
-        InventoryManager.instance.SetItem(index, null);
-        InventoryManager.instance.RefreshUI();
+        container.SetItem(slotIndex, null);
+        container.RefreshUI();
         Destroy(item.gameObject);
+    }
 
-        LoadSellMenu();
+    private int GetSellPrice(Item item)
+    {
+        // Prix de revente = moitié du prix d'achat, arrondi, minimum 1.
+        return Mathf.Max(1, Mathf.RoundToInt(item.price * 0.5f));
+    }
+
+    private Component FindGoldOwner(out FieldInfo field)
+    {
+        foreach (var component in FindObjectsOfType<MonoBehaviour>())
+        {
+            field = component.GetType().GetField("gold",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (field != null && field.FieldType == typeof(int)) return component;
+        }
+
+        field = null;
+        return null;
+    }
+
+    private int GetGold()
+    {
+        FieldInfo field;
+        Component owner = FindGoldOwner(out field);
+        return owner == null ? 0 : (int)field.GetValue(owner);
+    }
+
+    private void SetGold(int value)
+    {
+        FieldInfo field;
+        Component owner = FindGoldOwner(out field);
+        if (owner != null) field.SetValue(owner, value);
     }
 }

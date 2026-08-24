@@ -21,6 +21,7 @@ public class DialogueManager : MonoBehaviour
     private string[] currentLines;
     private string[] currentChoices;
     private System.Action<int> onChoiceMade;
+    private System.Action onDialogueEnd;
 
     private int currentLineIndex;
     private bool isDialogueActive = false;
@@ -68,7 +69,7 @@ public class DialogueManager : MonoBehaviour
     /// des options cliquables apparaissent et "onChoiceSelected" est appelé
     /// avec l'index choisi (0 ou 1) au lieu de fermer directement le dialogue.
     /// </summary>
-    public void StartDialogue(string speakerName, string[] lines, string[] choices = null, System.Action<int> onChoiceSelected = null)
+    public void StartDialogue(string speakerName, string[] lines, string[] choices = null, System.Action<int> onChoiceSelected = null, System.Action onDialogueEnd = null)
     {
         if (lines == null || lines.Length == 0) return;
 
@@ -81,6 +82,7 @@ public class DialogueManager : MonoBehaviour
         currentLines = lines;
         currentChoices = choices;
         onChoiceMade = onChoiceSelected;
+        this.onDialogueEnd = onDialogueEnd;
         currentLineIndex = 0;
         isDialogueActive = true;
         isChoiceActive = false;
@@ -162,5 +164,9 @@ public class DialogueManager : MonoBehaviour
         isDialogueActive = false;
         isChoiceActive = false;
         dialoguePanel.SetActive(false);
+
+        var callback = onDialogueEnd;
+        onDialogueEnd = null;
+        callback?.Invoke();
     }
 }
