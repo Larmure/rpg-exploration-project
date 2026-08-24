@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class EnemyDetectionZone : MonoBehaviour
 {
-    private EnemyScript enemyScript;
+    private Enemy enemy;
 
     void Start()
     {
-        enemyScript = GetComponentInParent<EnemyScript>();
+        enemy = GetComponentInParent<Enemy>();
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            enemyScript.PlayerDetected();
+            enemy.PlayerDetected();
         }
     }
 }

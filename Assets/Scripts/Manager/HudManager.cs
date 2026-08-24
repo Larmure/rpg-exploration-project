@@ -19,9 +19,9 @@ public class HudManager : MonoBehaviour
 
     private void Update()
     {
-        healthText.text = $"{PlayerScript.instance.currentHealth}/{PlayerScript.instance.maxHealth}";
-        armorText.text = $"Armor {PlayerScript.instance.armorPoints}"; 
-        goldText.text = $"{PlayerScript.instance.gold}";
-        manaText.text = $"{PlayerScript.instance.currentMana}/{PlayerScript.instance.maxMana}";
+        healthText.text = $"{Player.instance.GetCurrentHealth()}/{Player.instance.GetMaxHealth()}";
+        armorText.text = $"Armor {Player.instance.GetArmorPoints()}"; 
+        goldText.text = $"{Player.instance.gold}";
+        manaText.text = $"{Player.instance.GetCurrentMana()}/{Player.instance.GetMaxMana()}";
     }
 }

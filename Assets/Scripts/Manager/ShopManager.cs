@@ -192,7 +192,7 @@ public class ShopManager : MonoBehaviour
         Item template = currentMerchant.itemsForSale[index];
         if (template == null) return;
 
-        if (PlayerScript.instance.gold < template.price)
+        if (Player.instance.gold < template.price)
         {
             Debug.Log("Pas assez d'or !");
             return;
@@ -218,7 +218,7 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        PlayerScript.instance.gold -= template.price;
+        Player.instance.gold -= template.price;
         LoadBuyMenu();
     }
 
@@ -234,7 +234,7 @@ public class ShopManager : MonoBehaviour
         }
 
         int sellPrice = GetSellPrice(item);
-        PlayerScript.instance.gold += sellPrice;
+        Player.instance.gold += sellPrice;
 
         InventoryManager.instance.SetItem(index, null);
         InventoryManager.instance.RefreshUI();

@@ -24,7 +24,7 @@ public class Food : Item
         {
             case FoodType.health:
                 {
-                    PlayerScript.instance.Heal(healAmount);
+                    Player.instance.Heal(healAmount);
                     RemoveItem(1);
                 }
                 break;

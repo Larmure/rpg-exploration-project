@@ -48,7 +48,7 @@ public class CoinItem : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PlayerScript.instance.AddGold(value);
+            Player.instance.AddGold(value);
             Destroy(gameObject);
         }
     }

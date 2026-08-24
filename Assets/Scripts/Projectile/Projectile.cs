@@ -27,7 +27,7 @@ public abstract class Projectile : MonoBehaviour
     {
         if (((1 << other.gameObject.layer) & enemyLayer) == 0) return;
 
-        EnemyScript enemy = other.GetComponentInParent<EnemyScript>();
+        Enemy enemy = other.GetComponentInParent<Enemy>();
         if (enemy == null) return;
 
         enemy.TakeDamage(data.damage);
@@ -37,7 +37,7 @@ public abstract class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-    protected abstract void OnHitEnemy(EnemyScript enemy, Collider2D other);
+    protected abstract void OnHitEnemy(Enemy enemy, Collider2D other);
 
     protected virtual void SpawnHitEffect(Collider2D other)
     {

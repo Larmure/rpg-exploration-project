@@ -13,19 +13,19 @@ public class ArmorItem : EquipmentItem
 
     protected override void OnEquipped()
     {
-        if (PlayerScript.instance != null)
+        if (Player.instance != null)
         {
-            PlayerScript.instance.armorPoints += armorPoints;
-            Debug.Log($"{nameItem} : +{armorPoints} armor (total: {PlayerScript.instance.armorPoints})");
+            Player.instance.SetArmorPoints(Player.instance.GetArmorPoints() + armorPoints);
+            Debug.Log($"{nameItem} : +{armorPoints} armor (total: {Player.instance.GetArmorPoints()})");
         }
     }
 
     protected override void OnUnequipped()
     {
-        if (PlayerScript.instance != null)
+        if (Player.instance != null)
         {
-            PlayerScript.instance.armorPoints -= armorPoints;
-            Debug.Log($"{nameItem}  : -{armorPoints} armor (total: {PlayerScript.instance.armorPoints})");
+            Player.instance.SetArmorPoints(Player.instance.GetArmorPoints() - armorPoints);
+            Debug.Log($"{nameItem}  : -{armorPoints} armor (total: {Player.instance.GetArmorPoints()})");
         }
     }
 }

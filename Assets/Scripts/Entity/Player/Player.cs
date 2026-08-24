@@ -1,32 +1,24 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlayerScript : MonoBehaviour
+public class Player : Entity
 {
 
-    public static PlayerScript instance;
+    public static Player instance;
 
     [Header("Stats")]
-    [SerializeField] public int maxHealth = 100;
-    [SerializeField] public int currentHealth = 100;
-    [SerializeField] public int armorPoints = 0;
     [SerializeField] private float invincibilityDuration = 1f;
     [SerializeField] private float blinkInterval = 0.005f;
-    [SerializeField] private float moveSpeed = 5f;
-
-    [SerializeField] public int maxMana = 100;
-    [SerializeField] public int currentMana = 100;
+    [SerializeField] private int maxMana = 100;
+    [SerializeField] private int currentMana = 100;
 
 
     [Header("Attack")]
     [SerializeField] private float attackDuration = 0.4f;
     [SerializeField] private float attackCooldown = 0.2f;
-    [SerializeField] private int attackDamage = 10;
     [SerializeField] private float attackDistance = 0.5f;
     [SerializeField] private float attackRadius = 0.8f;
     [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private float weaponKnockbackForce = 6f; 
-    [SerializeField] private float weaponKnockbackDuration = 0.15f; 
 
     [Header("Magic")]
     [SerializeField] private GameObject projectilePrefab;
@@ -35,24 +27,13 @@ public class PlayerScript : MonoBehaviour
     [Header("Currency")]
     [SerializeField] public int gold = 0;
     
-
-    [Header("Knockback")]
-    private bool isKnockedBack = false;
-    private Vector2 knockbackStartVelocity;
-    private float knockbackTimer = 0f;
-    private float knockbackDuration = 0f;
-
-    private Rigidbody2D rb;
-    private Animator animator;
     private Vector2 moveInput;
-    private bool isInvincible = false;
     private bool isAttacking = false;
     private bool isCasting = false;
     private float attackCooldownTimer = 0f;
 
     private float lastMoveX = 0f;
     private float lastMoveY = -1f;
-    private bool isDead = false;
     private Vector2 attackDirection = Vector2.down;
     private Camera mainCamera;
     private SpriteRenderer spriteRenderer;
@@ -65,8 +46,17 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private float interactionRange = 1.5f;
     [SerializeField] private LayerMask interactableLayer;
 
-    private void Awake()
+    protected override void Start()
     {
+        mainCamera = Camera.main;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        healthBar.SetMaxValue(maxHealth);
+        manaBar.SetMaxValue(maxMana);
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
         if (instance == null)
         {
             instance = this;
@@ -74,17 +64,8 @@ public class PlayerScript : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
-    }
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
-        mainCamera = Camera.main;
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        healthBar.SetMaxValue(maxHealth);
-        manaBar.SetMaxValue(maxMana);
     }
 
     void Update()
@@ -266,11 +247,11 @@ public class PlayerScript : MonoBehaviour
 
         foreach (Collider2D hit in hits)
         {
-            EnemyScript enemy = hit.GetComponent<EnemyScript>();
+            Enemy enemy = hit.GetComponent<Enemy>();
             if (enemy != null)
             {
                 Vector2 knockDir = (enemy.transform.position - transform.position).normalized;
-                enemy.ApplyKnockback(knockDir, weaponKnockbackForce, weaponKnockbackDuration);
+                enemy.ApplyKnockback(knockDir, attackKnockbackForce, attackKnockbackDuration);
                 enemy.TakeDamage(attackDamage);
                 enemyHit = true;
             }
@@ -295,28 +276,9 @@ public class PlayerScript : MonoBehaviour
         animator.SetBool("IsCasting", false);
     }
 
-    void FixedUpdate()
+    protected override void HandleMovement()
     {
-        if (isDead) return;
-
-        if (isKnockedBack)
-        {
-            knockbackTimer += Time.fixedDeltaTime;
-            float t = Mathf.Clamp01(knockbackTimer / knockbackDuration);
-            float easedMultiplier = Mathf.Pow(1f - t, 2f);
-
-            Vector2 currentKnockbackVelocity = knockbackStartVelocity * easedMultiplier;
-            rb.MovePosition(rb.position + currentKnockbackVelocity * Time.fixedDeltaTime);
-
-            if (t >= 1f)
-            {
-                isKnockedBack = false;
-            }
-        }
-        else
-        {
-            rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
-        }
+        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
     }
 
     private void UpdateAnimator()
@@ -368,7 +330,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int amount)
+    public override void TakeDamage(int amount)
     {
         if (isInvincible || isDead) return;
 
@@ -390,10 +352,9 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    public void Heal(int amount)
+    public override void Heal(int amount)
     {
-        currentHealth += amount;
-        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        base.Heal(amount);
         healthBar.SetValue(currentHealth);
     }
 
@@ -417,7 +378,7 @@ public class PlayerScript : MonoBehaviour
         isInvincible = false;
     }
 
-    private void Die()
+    public override void Die()
     {
         if (isDead) return;
         isDead = true;
@@ -438,19 +399,6 @@ public class PlayerScript : MonoBehaviour
             GameOverManager.Instance.TriggerGameOver();
     }
 
-    public int GetCurrentHealth() => currentHealth;
-    public int GetMaxHealth() => maxHealth;
-
-    public void ApplyKnockback(Vector2 direction, float force, float duration)
-    {
-        if (isDead || isInvincible) return;
-
-        isKnockedBack = true;
-        knockbackStartVelocity = direction.normalized * force;
-        knockbackDuration = duration;
-        knockbackTimer = 0f;
-    }
-
     // Debug 
     private void OnDrawGizmosSelected()
     {
@@ -466,4 +414,7 @@ public class PlayerScript : MonoBehaviour
         Debug.Log($"Gold: +{amount} (total: {gold})");
         // TODO: si tu as un HUD pour l'or, appelle-le ici, ex: goldText.text = gold.ToString();
     }
+
+    public int GetCurrentMana() => currentMana;
+    public int GetMaxMana() => maxMana;
 }
