@@ -79,26 +79,26 @@ public class Item : MonoBehaviour
         return true;
     }
 
-    public virtual bool RemoveItemFromHotbar()
+    public virtual bool RemoveItemFromHotbar(int quantity = 1)
     {
-        return TryRemoveItemFromArray(HotbarManager.instance.inventories, HotbarManager.instance.LoadHotbar);
+        return TryRemoveItemFromArray(HotbarManager.instance.inventories, HotbarManager.instance.LoadHotbar, quantity);
     }
 
-    public virtual bool RemoveItemFromInventory()
+    public virtual bool RemoveItemFromInventory(int quantity = 1)
     {
         if (InventoryManager.instance == null) return false;
-        return TryRemoveItemFromArray(InventoryManager.instance.inventories, InventoryManager.instance.LoadInventory);
+        return TryRemoveItemFromArray(InventoryManager.instance.inventories, InventoryManager.instance.LoadInventory, quantity);
     }
 
-    public virtual void RemoveItem()
+    public virtual void RemoveItem(int quantity = 1)
     {
-    if (!RemoveItemFromHotbar())
-    {
-        RemoveItemFromInventory();
-    }
-}   
+        if (!RemoveItemFromHotbar(quantity))
+        {
+            RemoveItemFromInventory(quantity);
+        }
+    }   
 
-    private bool TryRemoveItemFromArray(Item[] items, System.Action reload)
+    private bool TryRemoveItemFromArray(Item[] items, System.Action reload, int quantity)
     {
         bool found = false;
 
@@ -108,7 +108,7 @@ public class Item : MonoBehaviour
             {
                 found = true;
 
-                items[i].amount -= amount;
+                items[i].amount -= quantity;
 
                 if (items[i].amount <= 0)
                 {

@@ -10,6 +10,7 @@ public enum FoodType
 public class Food : Item
 {
     public FoodType foodType;
+    public int healAmount = 10;
     protected override void Awake()
     {
         base.Awake();
@@ -23,11 +24,8 @@ public class Food : Item
         {
             case FoodType.health:
                 {
-                    if(PlayerScript.instance.currentHealth + amount <= PlayerScript.instance.maxHealth)
-                    {
-                        PlayerScript.instance.Heal(amount);
-                        RemoveItem();
-                    }
+                    PlayerScript.instance.Heal(healAmount);
+                    RemoveItem(1);
                 }
                 break;
         }

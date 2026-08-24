@@ -1036,6 +1036,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: apple
       objectReference: {fileID: 0}
+    - target: {fileID: 6946369809301550896, guid: 0f29a46ce83f0c445b3fcce3104cc12b, type: 3}
+      propertyPath: amount
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7137265590615116396, guid: 0f29a46ce83f0c445b3fcce3104cc12b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.28
