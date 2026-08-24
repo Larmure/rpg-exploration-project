@@ -32,6 +32,10 @@ public class ShopManager : MonoBehaviour
 
         blankItem = shopDisplay.GetChild(0).Find("Icon").GetComponent<Image>().sprite;
 
+        parentCanvas = shopDisplay.GetComponentInParent<Canvas>();
+        if (priceTooltip != null)
+            priceTooltip.gameObject.SetActive(false);
+
         if (shopPanel != null)
             shopPanel.SetActive(false);
     }
@@ -42,6 +46,27 @@ public class ShopManager : MonoBehaviour
         {
             CloseShop();
         }
+
+        if (tooltipVisible)
+        {
+            UpdateTooltipPosition();
+        }
+    }
+
+    // ---------------- TOOLTIP DE PRIX (suit la souris) ----------------
+
+    private void UpdateTooltipPosition()
+    {
+        if (priceTooltip == null || parentCanvas == null) return;
+
+        RectTransform canvasRect = parentCanvas.transform as RectTransform;
+        Camera cam = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : parentCanvas.worldCamera;
+
+        Vector2 localPoint;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, Input.mousePosition, cam, out localPoint))
+        {
+            priceTooltip.anchoredPosition = localPoint + priceTooltipOffset;
+        }
     }
 
     // ---------------- OUVERTURE / FERMETURE ----------------
@@ -49,6 +74,16 @@ public class ShopManager : MonoBehaviour
     [Header("UI à masquer pendant le shop")]
     public GameObject inventoryUI;
     public GameObject equipmentUI;
+
+    [Header("Price Tooltip (suit la souris)")]
+    [Tooltip("Objet racine du tooltip (background + texte). Pivot recommandé : haut-droite (1,1).")]
+    public RectTransform priceTooltip;
+    public TextMeshProUGUI priceTooltipText;
+    [Tooltip("Décalage en pixels par rapport au curseur.")]
+    public Vector2 priceTooltipOffset = new Vector2(-8f, -8f);
+
+    private Canvas parentCanvas;
+    private bool tooltipVisible;
 
     public void OpenShop(Merchant merchant)
     {
@@ -94,18 +129,25 @@ public class ShopManager : MonoBehaviour
 
     public void ShowPriceForSlot(int index)
     {
-        if (slotUIs == null || index >= slotUIs.Length) return;
-
         Item item = GetItemForSlot(index);
         if (item == null) return;
 
-        slotUIs[index].ShowPrice(item.price.ToString(), Color.white);
+        if (priceTooltipText != null)
+            priceTooltipText.text = item.price.ToString();
+
+        if (priceTooltip != null)
+            priceTooltip.gameObject.SetActive(true);
+
+        tooltipVisible = true;
+        UpdateTooltipPosition();
     }
 
     public void HidePriceForSlot(int index)
     {
-        if (slotUIs == null || index >= slotUIs.Length) return;
-        slotUIs[index].HidePrice();
+        if (priceTooltip != null)
+            priceTooltip.gameObject.SetActive(false);
+
+        tooltipVisible = false;
     }
 
     private Item GetItemForSlot(int index)
@@ -156,10 +198,11 @@ public class ShopManager : MonoBehaviour
         }
 
         SetGold(GetGold() - template.price);
+
         // Retire l'item du stock du marchand (achat unique par slot)
         currentMerchant.itemsForSale[index] = null;
-        LoadBuyMenu();
 
+        LoadBuyMenu();
     }
 
     // ---------------- CLIC SUR HOTBAR / INVENTORY / EQUIPMENT = VENTE ----------------
