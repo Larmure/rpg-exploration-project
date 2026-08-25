@@ -8,6 +8,11 @@ public class Icebolt : Projectile
     {
         Vector2 knockDir = (enemy.transform.position - transform.position).normalized;
         enemy.ApplyKnockback(knockDir, IceboltStats.knockbackForce, IceboltStats.knockbackDuration);
-        enemy.ApplySlow(IceboltStats.slowMultiplier, IceboltStats.slowDuration);
+
+        var statusEffects = enemy.GetComponent<StatusEffectController>();
+        if (statusEffects != null)
+        {
+            statusEffects.ApplySlow(IceboltStats.slowMultiplier, IceboltStats.slowDuration);
+        }
     }
 }

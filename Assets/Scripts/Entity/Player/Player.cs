@@ -49,7 +49,6 @@ public class Player : Entity
     protected override void Start()
     {
         mainCamera = Camera.main;
-        spriteRenderer = GetComponent<SpriteRenderer>();
         healthBar.SetMaxValue(maxHealth);
         manaBar.SetMaxValue(maxMana);
     }
