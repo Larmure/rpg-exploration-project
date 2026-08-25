@@ -36,7 +36,7 @@ public class Player : Entity
     private float lastMoveY = -1f;
     private Vector2 attackDirection = Vector2.down;
     private Camera mainCamera;
-    private SpriteRenderer spriteRenderer;
+    
 
     [Header("UI")]
     public Bar healthBar;

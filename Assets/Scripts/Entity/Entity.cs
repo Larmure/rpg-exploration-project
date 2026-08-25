@@ -15,6 +15,7 @@ public abstract class Entity : MonoBehaviour
     protected Rigidbody2D rb;
     protected Animator animator;
     protected bool isDead = false;
+    protected SpriteRenderer spriteRenderer;
 
     [Header("Attack")]
     [SerializeField] protected int attackDamage = 10;
@@ -24,6 +25,14 @@ public abstract class Entity : MonoBehaviour
     protected Vector2 knockbackStartVelocity;
     protected float knockbackTimer = 0f;
     protected float knockbackDuration = 0f;
+
+    [Header("Slow")]
+    [SerializeField] protected Color slowTintColor = new Color(0.5f, 0.8f, 1f, 1f);
+    protected bool isSlowed = false;
+    protected float slowMultiplier = 1f;
+    protected float slowTimer = 0f;
+    protected float slowDuration = 0f;
+    private Color baseColor;
 
     protected bool isInvincible = false;
 
@@ -40,6 +49,15 @@ public abstract class Entity : MonoBehaviour
         // }
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            baseColor = spriteRenderer.color;
+        }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name} needs a SpriteRenderer.");
+        }
     }
 
     protected virtual void Start()
@@ -50,6 +68,11 @@ public abstract class Entity : MonoBehaviour
     protected virtual void FixedUpdate()
     {
         if (isDead) return;
+
+        if (isSlowed)
+        {
+            HandleSlow();
+        }
 
         if (isKnockedBack)
         {
@@ -78,6 +101,18 @@ public abstract class Entity : MonoBehaviour
         }
     }
 
+    private void HandleSlow()
+    {
+        slowTimer += Time.fixedDeltaTime;
+
+        if (slowTimer >= slowDuration)
+        {
+            isSlowed = false;
+            slowMultiplier = 1f;
+            SetTint(baseColor);
+        }
+    }
+
     public virtual void ApplyKnockback(Vector2 direction, float force, float duration)
     {
         if (isDead || isInvincible) return;
@@ -86,6 +121,31 @@ public abstract class Entity : MonoBehaviour
         knockbackStartVelocity = direction.normalized * force;
         knockbackDuration = duration;
         knockbackTimer = 0f;
+    }
+
+    public virtual void ApplySlow(float multiplier, float duration)
+    {
+        if (isDead || isInvincible) return;
+
+        if (isSlowed)
+        {
+            multiplier = Mathf.Min(multiplier, slowMultiplier);
+        }
+
+        isSlowed = true;
+        slowMultiplier = Mathf.Clamp01(multiplier);
+        slowDuration = duration;
+        slowTimer = 0f;
+        SetTint(slowTintColor);
+        //Debug.Log($"Entity {gameObject.name} is slowed: multiplier={slowMultiplier}, duration={slowDuration}");
+    }
+
+    protected void SetTint(Color color)
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = color;
+        }
     }
 
     public abstract void TakeDamage(int amount);
@@ -102,4 +162,8 @@ public abstract class Entity : MonoBehaviour
     public int GetMaxHealth() => maxHealth;
     public int GetArmorPoints() => armorPoints;
     public void SetArmorPoints(int value) => armorPoints = value;
+    protected float GetCurrentMoveSpeed()
+    {
+        return moveSpeed * (isSlowed ? slowMultiplier : 1f);
+    }
 }
