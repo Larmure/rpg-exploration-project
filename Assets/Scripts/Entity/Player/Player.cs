@@ -96,7 +96,9 @@ public class Player : Entity
 
         moveInput = new Vector2(horizontal, vertical).normalized;
 
-        bool leftClick = Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject();
+        bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
+        bool leftClick = Input.GetMouseButtonDown(0) && !pointerOverUI;
 
         if (leftClick)
         {

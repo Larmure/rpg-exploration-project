@@ -65,6 +65,9 @@ public class EquipmentManager : MonoBehaviour, IItemContainer
 
     private void Update()
     {
+        if (ShopManager.instance != null && ShopManager.instance.IsShopOpen)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleEquipment();

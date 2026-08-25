@@ -11,6 +11,7 @@ public class TransitionManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.SetParent(null); // détache l'objet pour qu'il devienne racine
             DontDestroyOnLoad(gameObject);
         }
         else
