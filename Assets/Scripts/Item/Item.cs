@@ -44,7 +44,7 @@ public class Item : MonoBehaviour
         {
             if (items[i] != null &&
                 items[i].nameItem == this.nameItem &&
-               items[i].amount < 99)
+            items[i].amount < 99)
             {
                 haveFoundItem = true;
                 items[i].amount += amount;
@@ -62,6 +62,12 @@ public class Item : MonoBehaviour
                 {
                     items[i] = this;
                     foundEmptySlot = true;
+
+                    // L'objet doit survivre au changement de scène, comme le
+                    // manager qui le référence.
+                    transform.SetParent(null);
+                    DontDestroyOnLoad(gameObject);
+
                     break;
                 }
             }
