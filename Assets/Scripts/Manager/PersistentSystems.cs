@@ -15,6 +15,7 @@ public class SystemsPersistence : MonoBehaviour
     {
         if (persistedRoots.Contains(gameObject.name))
         {
+            gameObject.SetActive(false); // <- ajouté : invisible aux Find dès cette frame
             Destroy(gameObject);
             return;
         }

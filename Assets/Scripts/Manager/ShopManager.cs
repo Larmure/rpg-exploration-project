@@ -19,6 +19,10 @@ public class ShopManager : MonoBehaviour
 
     private void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            return;
+        }
         instance = this;
     }
 

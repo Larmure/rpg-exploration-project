@@ -14,6 +14,10 @@ public class InventoryManager : MonoBehaviour, IItemContainer
 
     private void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            return;
+        }
         instance = this;
     }
 
