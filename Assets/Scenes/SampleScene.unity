@@ -3213,6 +3213,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8108333112362107517, guid: 00adc86e7e8d63f4d8cf7355319e635c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1927554379}
+    - targetCorrespondingSourceObject: {fileID: 8108333112362107517, guid: 00adc86e7e8d63f4d8cf7355319e635c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927554385}
   m_SourcePrefab: {fileID: 100100000, guid: 00adc86e7e8d63f4d8cf7355319e635c, type: 3}
 --- !u!4 &1927554372 stripped
 Transform:
@@ -3244,6 +3247,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25e3f2bedb9fc420d97f2a5eef65ded8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+--- !u!114 &1927554385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 639196204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f720a057ca5456dd898f0d5082e3d374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CliffJump
+  ledgeLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  directionThreshold: 0.5
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  landingCheckSize: {x: 0.4, y: 0.4}
 --- !u!114 &1941508911 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7960228969891566815, guid: 6d1fcc26c8637c14194f8edb0879be3c, type: 3}

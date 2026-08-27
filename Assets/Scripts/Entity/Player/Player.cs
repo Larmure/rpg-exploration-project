@@ -67,9 +67,20 @@ public class Player : Entity
         }
     }
 
+    // Utilisé par CliffJump.cs pour geler temporairement les contrôles pendant un saut de falaise
+    private bool controlLocked = false;
+
+    public void SetControlLocked(bool locked)
+    {
+        controlLocked = locked;
+        if (locked) moveInput = Vector2.zero;
+    }
+
+    public Vector2 GetLastMoveDirection() => new Vector2(lastMoveX, lastMoveY);
+
     void Update()
     {
-        if (isDead) return;
+        if (isDead || controlLocked) return;
 
         HandleInput();
         UpdateAnimator();
@@ -279,6 +290,8 @@ public class Player : Entity
 
     protected override void HandleMovement()
     {
+        if (controlLocked) return;
+        
         rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
     }
 
