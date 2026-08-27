@@ -3078,6 +3078,26 @@ PrefabInstance:
       propertyPath: maxHealth
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
+      propertyPath: moveSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
+      propertyPath: sleepDelay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
+      propertyPath: attackRange
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
+      propertyPath: attackKnockbackForce
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
+      propertyPath: directionUpdateInterval
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8055953954093953637, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
       propertyPath: m_Name
       value: Enemy

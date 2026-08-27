@@ -9,6 +9,16 @@ public class Enemy : Entity
     private float attackCooldownTimer = 0f;
     [SerializeField] private float damageDelay = 0.3f;
 
+    [Header("Chase")]
+    [SerializeField] private float directionUpdateInterval = 1f;
+    [SerializeField] private float pauseBeforeDirectionChange = 0.5f;
+    [SerializeField] private float sleepDelay = 3f;
+    private Vector2 currentMoveDirection = Vector2.zero;
+    private float directionUpdateTimer = 0f;
+    private bool isPausingBeforeChange = false;
+    private bool playerDetected = false;
+    private float pauseTimer = 0f;
+
     public override void TakeDamage(int amount)
     {
         currentHealth -= amount;
@@ -30,7 +40,30 @@ public class Enemy : Entity
 
     public void PlayerDetected()
     {
-        animator.SetTrigger("PlayerNear");
+        CancelInvoke(nameof(GoToSleep));
+        if (!playerDetected)
+        {
+            animator.ResetTrigger("GoToSleep");
+            animator.SetTrigger("PlayerNear");
+            currentMoveDirection = (player.position - transform.position).normalized;
+            directionUpdateTimer = directionUpdateInterval;
+        }
+
+        playerDetected = true;
+    }
+
+    public void PlayerLost()
+    {
+        Invoke(nameof(GoToSleep), sleepDelay);
+    }
+
+    private void GoToSleep()
+    {
+        playerDetected = false;
+        isPausingBeforeChange = false;
+        currentMoveDirection = Vector2.zero;
+        animator.ResetTrigger("PlayerNear");
+        animator.SetTrigger("GoToSleep");
     }
 
     void Update()
@@ -88,6 +121,47 @@ public class Enemy : Entity
             }
         }
 
+    }
+
+    protected override void HandleMovement()
+    {
+        if (GameOverManager.IsGameOver) return;
+        if (!playerDetected || player == null) return;
+
+        float distance = Vector2.Distance(transform.position, player.position);
+
+        if (distance <= attackRange + 0.2f) return;
+
+        if (isPausingBeforeChange)
+        {
+            pauseTimer -= Time.fixedDeltaTime;
+
+            if (pauseTimer <= 0f)
+            {
+                isPausingBeforeChange = false;
+                currentMoveDirection = (player.position - transform.position).normalized;
+                directionUpdateTimer = directionUpdateInterval;
+
+                rb.MovePosition(rb.position + currentMoveDirection * GetCurrentMoveSpeed() * Time.fixedDeltaTime);
+                animator.SetFloat("MoveX", currentMoveDirection.x);
+                animator.SetFloat("MoveY", currentMoveDirection.y);
+            }
+
+            return;
+        }
+
+        directionUpdateTimer -= Time.fixedDeltaTime;
+        if (directionUpdateTimer <= 0f)
+        {
+            isPausingBeforeChange = true;
+            pauseTimer = pauseBeforeDirectionChange;
+            return; 
+        }
+
+        rb.MovePosition(rb.position + currentMoveDirection * GetCurrentMoveSpeed() * Time.fixedDeltaTime);
+
+        animator.SetFloat("MoveX", currentMoveDirection.x);
+     animator.SetFloat("MoveY", currentMoveDirection.y);
     }
 
 }
