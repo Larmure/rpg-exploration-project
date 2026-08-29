@@ -3289,7 +3289,7 @@ MonoBehaviour:
   directionThreshold: 0.5
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 4096
   landingCheckSize: {x: 0.4, y: 0.4}
 --- !u!114 &1941508911 stripped
 MonoBehaviour:
