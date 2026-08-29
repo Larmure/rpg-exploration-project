@@ -17,9 +17,19 @@ public class CoinItem : MonoBehaviour
     [HideInInspector]
     public int value;
 
+    private PersistentObjectId persistentId;
+
     void Awake()
     {
         SetValue();
+
+        persistentId = GetComponent<PersistentObjectId>();
+
+        if (persistentId != null && WorldState.Instance != null &&
+            WorldState.Instance.IsCollected(persistentId.Id))
+        {
+            Destroy(gameObject);
+        }
     }
 
     void SetValue()
@@ -49,6 +59,12 @@ public class CoinItem : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Player.instance.AddGold(value);
+
+            if (persistentId != null && WorldState.Instance != null)
+            {
+                WorldState.Instance.MarkCollected(persistentId.Id);
+            }
+
             Destroy(gameObject);
         }
     }

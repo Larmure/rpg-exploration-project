@@ -18,7 +18,18 @@ public class Item : MonoBehaviour
     public bool isUsed;
     public int price;
 
-    protected virtual void Awake() { }
+    protected PersistentObjectId persistentId;
+
+    protected virtual void Awake()
+    {
+        persistentId = GetComponent<PersistentObjectId>();
+
+        if (persistentId != null && WorldState.Instance != null &&
+            WorldState.Instance.IsCollected(persistentId.Id))
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public virtual void UseItem()
     {
@@ -163,7 +174,13 @@ public class Item : MonoBehaviour
                     return;
                 }
             }
+
+            if (persistentId != null && WorldState.Instance != null)
+            {
+                WorldState.Instance.MarkCollected(persistentId.Id);
+            }
         }
+
         HotbarManager.instance.LoadHotbar();
     }
 }
