@@ -11,6 +11,7 @@ public class Player : Entity
     [SerializeField] private float blinkInterval = 0.005f;
     [SerializeField] private int maxMana = 100;
     [SerializeField] private int currentMana = 100;
+    private int invincibilityStackCount = 0;
 
 
     [Header("Attack")]
@@ -26,6 +27,16 @@ public class Player : Entity
 
     [Header("Currency")]
     [SerializeField] public int gold = 0;
+
+    [Header("Dash")]
+    [SerializeField] private float dashSpeed = 15f;
+    [SerializeField] private float dashDuration = 0.15f;
+    [SerializeField] private float dashCooldown = 0.8f;
+    [SerializeField] private float dashInvincibilityDuration = 0.15f;
+    private bool isDashing = false;
+    private float dashCooldownTimer = 0f;
+    private float dashTimer = 0f;
+    private Vector2 dashDirection;
     
     private Vector2 moveInput;
     private bool isAttacking = false;
@@ -87,6 +98,15 @@ public class Player : Entity
 
         if (attackCooldownTimer > 0f)
             attackCooldownTimer -= Time.deltaTime;
+
+        if (isDashing)
+        {
+            dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0f)
+            {
+            isDashing = false;
+            }
+        }
     }
 
     private void HandleInput()
@@ -134,6 +154,16 @@ public class Player : Entity
         if (usePressed)
         {
             UseCurrentItem();
+        }
+
+        if (dashCooldownTimer > 0f)
+        dashCooldownTimer -= Time.deltaTime;
+
+        bool dashPressed = Input.GetKeyDown(KeyCode.LeftShift);
+
+        if (dashPressed && !isDashing && dashCooldownTimer <= 0f && !isAttacking && !isCasting)
+        {
+            StartDash();
         }
     }
 
@@ -288,9 +318,45 @@ public class Player : Entity
         animator.SetBool("IsCasting", false);
     }
 
+    private void StartDash()
+    {
+        Vector2 dir;
+
+        bool isMoving = moveInput.sqrMagnitude > 0.01f;
+
+        if (isMoving)
+        {
+            dir = moveInput.normalized;
+        }
+        else
+        {
+            dir = -GetMouseDirection();
+        }
+
+        dashDirection = dir;
+        isDashing = true;
+        dashTimer = dashDuration;
+        dashCooldownTimer = dashCooldown;
+
+        StartCoroutine(DashInvincibility());
+    }
+
+    private System.Collections.IEnumerator DashInvincibility()
+    {
+        AddInvincibility();
+        yield return new WaitForSeconds(dashInvincibilityDuration);
+        RemoveInvincibility();
+    }
+
     protected override void HandleMovement()
     {
         if (controlLocked) return;
+
+        if (isDashing)
+        {
+            rb.MovePosition(rb.position + dashDirection * dashSpeed * Time.fixedDeltaTime);
+            return;
+        }
         
         rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
     }
@@ -372,9 +438,21 @@ public class Player : Entity
         healthBar.SetValue(currentHealth);
     }
 
+    private void AddInvincibility()
+    {
+        invincibilityStackCount++;
+        isInvincible = true;
+    }
+
+    private void RemoveInvincibility()
+    {
+        invincibilityStackCount = Mathf.Max(0, invincibilityStackCount - 1);
+        isInvincible = invincibilityStackCount > 0;
+    }
+
     private System.Collections.IEnumerator InvincibilityFrames()
     {
-        isInvincible = true;
+        AddInvincibility();
 
         float elapsed = 0f;
         while (elapsed < invincibilityDuration)
@@ -389,7 +467,7 @@ public class Player : Entity
         if (spriteRenderer != null)
             spriteRenderer.enabled = true;
 
-        isInvincible = false;
+        RemoveInvincibility();
     }
 
     public override void Die()

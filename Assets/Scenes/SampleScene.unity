@@ -3153,6 +3153,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 257714494}
     m_Modifications:
+    - target: {fileID: 1485853180331266015, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
+      propertyPath: m_Radius
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3574711351479806316, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.57175
@@ -3203,7 +3207,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
       propertyPath: moveSpeed
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
       propertyPath: sleepDelay
@@ -3219,7 +3223,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3933965669557814936, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
       propertyPath: directionUpdateInterval
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8055953954093953637, guid: e42eb711cfe7abb46bea5e965b37e653, type: 3}
       propertyPath: m_Name
