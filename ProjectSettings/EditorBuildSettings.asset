@@ -11,6 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Map_Test02.unity
     guid: 2d9665ab7b24524d785938da3e848254
+  - enabled: 1
+    path: Assets/Scenes/StartScene.unity
+    guid: 9cc4e972ab4c93c40be99b27ed78e4ec
+  - enabled: 1
+    path: Assets/Scenes/StartOutdoor.unity
+    guid: 896f5921892c86c4faab5c1c97f61aa0
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

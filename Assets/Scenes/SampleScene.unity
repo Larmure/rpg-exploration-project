@@ -937,6 +937,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1312102448212452400, guid: 888f6df2dd1fff34681a5e91297f7920, type: 3}
+      propertyPath: npcName
+      value: Merchant
+      objectReference: {fileID: 0}
+    - target: {fileID: 1312102448212452400, guid: 888f6df2dd1fff34681a5e91297f7920, type: 3}
+      propertyPath: currentHealth
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1312102448212452400, guid: 888f6df2dd1fff34681a5e91297f7920, type: 3}
       propertyPath: itemsForSale.Array.size
       value: 2
       objectReference: {fileID: 0}
