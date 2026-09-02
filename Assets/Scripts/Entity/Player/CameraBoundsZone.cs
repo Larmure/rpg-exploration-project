@@ -22,7 +22,7 @@ public class CameraBoundsZone : MonoBehaviour
         Vector2 min = new Vector2(bounds.min.x, bounds.min.y);
         Vector2 max = new Vector2(bounds.max.x, bounds.max.y);
 
-        Debug.Log($"[CameraBoundsZone] min={min}, max={max}, size={bounds.size}");
+        //Debug.Log($"[CameraBoundsZone] min={min}, max={max}, size={bounds.size}");
 
         if (CameraFollow.Instance != null)
         {
@@ -30,9 +30,9 @@ public class CameraBoundsZone : MonoBehaviour
         }
         else
         {
-        Debug.LogWarning("[CameraBoundsZone] CameraFollow.Instance est null !");
+            //Debug.LogWarning("[CameraBoundsZone] CameraFollow.Instance est null !");
         }
-    
+
     }
 
     private void OnDrawGizmos()
