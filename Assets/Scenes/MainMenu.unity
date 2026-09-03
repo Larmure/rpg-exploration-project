@@ -396,7 +396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   continueButton: {fileID: 1226078972}
   settingsButton: {fileID: 1739252220}
-  firstLevelSceneName: SampleScene
+  firstLevelSceneName: StartScene
 --- !u!1 &193965480
 GameObject:
   m_ObjectHideFlags: 0

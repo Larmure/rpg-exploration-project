@@ -5,7 +5,7 @@ public class Enemy : Entity
     [Header("Attack")]
     [SerializeField] private float attackRange = 1.5f;
     [SerializeField] private float attackCooldown = 1.5f;
-    [SerializeField] private Transform player;
+    private Transform player;
     private float attackCooldownTimer = 0f;
     [SerializeField] private float damageDelay = 0.3f;
 
@@ -18,6 +18,36 @@ public class Enemy : Entity
     private bool isPausingBeforeChange = false;
     private bool playerDetected = false;
     private float pauseTimer = 0f;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        FindPlayer();
+    }
+
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        FindPlayer();
+    }
+
+    private void FindPlayer()
+    {
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+            player = playerObj.transform;
+        else
+            Debug.LogWarning($"{gameObject.name}: no player found in the scene.");
+    }
 
     public override void TakeDamage(int amount)
     {
@@ -105,11 +135,11 @@ public class Enemy : Entity
 
         float distance = Vector2.Distance(transform.position, player.position);
         // Debug.Log($"DealDamage appelé - distance: {distance}, attackRange: {attackRange}");
-        
+
         // float dx = Mathf.Abs(transform.position.x - player.position.x);
         // float dy = Mathf.Abs(transform.position.y - player.position.y);
         // Debug.Log($"dx={dx:F3} dy={dy:F3} distance={Vector2.Distance(transform.position, player.position):F3}");
-        
+
         if (distance <= attackRange + 0.2f)
         {
             Player Player = player.GetComponent<Player>();
@@ -155,13 +185,13 @@ public class Enemy : Entity
         {
             isPausingBeforeChange = true;
             pauseTimer = pauseBeforeDirectionChange;
-            return; 
+            return;
         }
 
         rb.MovePosition(rb.position + currentMoveDirection * GetCurrentMoveSpeed() * Time.fixedDeltaTime);
 
         animator.SetFloat("MoveX", currentMoveDirection.x);
-     animator.SetFloat("MoveY", currentMoveDirection.y);
+        animator.SetFloat("MoveY", currentMoveDirection.y);
     }
 
 }

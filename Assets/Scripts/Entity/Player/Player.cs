@@ -19,6 +19,7 @@ public class Player : Entity
     [SerializeField] private float attackCooldown = 0.2f;
     [SerializeField] private float attackDistance = 0.5f;
     [SerializeField] private float attackRadius = 0.8f;
+    [SerializeField] private Vector2 attackOrigin = new Vector2(0f, 0.4f);
     [SerializeField] private LayerMask enemyLayer;
 
     [Header("Magic")]
@@ -37,7 +38,7 @@ public class Player : Entity
     private float dashCooldownTimer = 0f;
     private float dashTimer = 0f;
     private Vector2 dashDirection;
-    
+
     private Vector2 moveInput;
     private bool isAttacking = false;
     private bool isCasting = false;
@@ -47,7 +48,7 @@ public class Player : Entity
     private float lastMoveY = -1f;
     private Vector2 attackDirection = Vector2.down;
     private Camera mainCamera;
-    
+
 
     [Header("UI")]
     public Bar healthBar;
@@ -104,7 +105,7 @@ public class Player : Entity
             dashTimer -= Time.deltaTime;
             if (dashTimer <= 0f)
             {
-            isDashing = false;
+                isDashing = false;
             }
         }
     }
@@ -149,7 +150,7 @@ public class Player : Entity
             Cast();
         }
 
-        bool usePressed = Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject(); 
+        bool usePressed = Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject();
 
         if (usePressed)
         {
@@ -157,7 +158,7 @@ public class Player : Entity
         }
 
         if (dashCooldownTimer > 0f)
-        dashCooldownTimer -= Time.deltaTime;
+            dashCooldownTimer -= Time.deltaTime;
 
         bool dashPressed = Input.GetKeyDown(KeyCode.LeftShift);
 
@@ -214,7 +215,7 @@ public class Player : Entity
             return new Vector2(lastMoveX, lastMoveY);
 
         Vector3 mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = -mainCamera.transform.position.z; 
+        mouseScreenPos.z = -mainCamera.transform.position.z;
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(mouseScreenPos);
 
         Vector2 dir = (Vector2)mouseWorldPos - (Vector2)transform.position;
@@ -259,7 +260,7 @@ public class Player : Entity
         int manaCost = projectilePrefab.GetComponent<Projectile>().ManaCost;
 
         if (currentMana < manaCost)
-        {         
+        {
             EndCast();
             return;
         }
@@ -283,7 +284,8 @@ public class Player : Entity
     {
         bool enemyHit = false;
 
-        Vector2 attackPos = (Vector2)transform.position + attackDirection * attackDistance;
+        Vector2 basePos = (Vector2)transform.position + attackOrigin;
+        Vector2 attackPos = basePos + attackDirection * attackDistance;
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPos, attackRadius, enemyLayer);
 
@@ -302,6 +304,7 @@ public class Player : Entity
         if (enemyHit)
         {
             currentMana += 5;
+            if (currentMana > maxMana) currentMana = maxMana;
             manaBar.SetValue(currentMana);
         }
     }
@@ -357,7 +360,7 @@ public class Player : Entity
             rb.MovePosition(rb.position + dashDirection * dashSpeed * Time.fixedDeltaTime);
             return;
         }
-        
+
         rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
     }
 
@@ -383,7 +386,7 @@ public class Player : Entity
         }
         else
         {
-        Vector2 dir = GetMouseDirection();
+            Vector2 dir = GetMouseDirection();
 
             if (isMoving)
             {
@@ -494,7 +497,8 @@ public class Player : Entity
     // Debug 
     private void OnDrawGizmosSelected()
     {
-        Vector2 attackPos = (Vector2)transform.position + attackDirection * attackDistance;
+        Vector2 basePos = (Vector2)transform.position + attackOrigin;
+        Vector2 attackPos = basePos + attackDirection * attackDistance;
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPos, attackRadius);
