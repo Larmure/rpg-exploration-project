@@ -12,7 +12,9 @@ public class NPC : Entity, IInteractable
         "Hi !"
     };
 
-
+    [Header("Story Tracking")]
+    [Tooltip("Leave empty if this NPC doesn't have a unique ID for story tracking.")]
+    [SerializeField] protected string npcId;
 
     public virtual void Interact()
     {
@@ -23,9 +25,16 @@ public class NPC : Entity, IInteractable
             null,
             OnDialogueEnd
         );
+
     }
 
-    protected virtual void OnDialogueEnd() { }
+    protected virtual void OnDialogueEnd()
+    {
+        if (!string.IsNullOrEmpty(npcId) && StoryState.Instance != null)
+        {
+            StoryState.Instance.MarkTalkedToNPC(npcId);
+        }
+    }
 
     public override void TakeDamage(int amount)
     {
